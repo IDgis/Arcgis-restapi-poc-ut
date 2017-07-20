@@ -17,12 +17,11 @@ public class SQLQuery {
 	
 	public static final Logger log = LoggerFactory.getLogger(SQLQuery.class);
 	
-	public static void executeQuery() {
+	public Map<String, Object> executeQuery(String query) {
 		Map<String, Object> map = new HashMap<>();
 		
 		try(Connection con = getConnection();
-			PreparedStatement stmt = con.prepareStatement(
-					"SELECT * FROM book WHERE unit_price > 47.7")) {
+			PreparedStatement stmt = con.prepareStatement(query)) {
 			
 			ResultSet rs = stmt.executeQuery();
 			
@@ -34,11 +33,12 @@ public class SQLQuery {
 				}
 			}
 		} catch (SQLException e) {
-			log.equals(e.getMessage());
+			log.error(e.getMessage());
 		}
+		return map;
 	}
 	
-	private static Connection getConnection() throws SQLException {
+	private Connection getConnection() throws SQLException {
 		String url = "jdbc:mysql://<host>:<port>/<database_name>";
 		Properties prop = new Properties();
 		prop.put("user", "test");

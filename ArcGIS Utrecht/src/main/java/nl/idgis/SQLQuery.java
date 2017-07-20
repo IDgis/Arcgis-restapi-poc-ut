@@ -17,7 +17,7 @@ public class SQLQuery {
 	
 	public static final Logger log = LoggerFactory.getLogger(SQLQuery.class);
 	
-	public static void main(String[] args) {
+	public static void executeQuery() {
 		Map<String, Object> map = new HashMap<>();
 		
 		try(Connection con = getConnection();

@@ -41,7 +41,7 @@ public static final Logger log = LoggerFactory.getLogger(QueryHandler.class);
 	}
 	
 	private static Connection getConnection(String userName, String password) throws SQLException {
-		//String url = "jdbc:mysql://<host>:<port>/<database_name>";
+		//String url = "jdbc:postgresql://<host>:<port>/<database_name>";
 		String url = "jdbc:postgresql://192.168.99.100:5432/<database_name>";
 		Properties prop = new Properties();
 		prop.put("user", userName);

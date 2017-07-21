@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import nl.idgis.error.ErrorMessageHandler;
 import nl.idgis.featurelayer.FeatureLayerHandler;
 import nl.idgis.featureserver.FeatureServerHandler;
 
@@ -17,6 +18,7 @@ import nl.idgis.featureserver.FeatureServerHandler;
 public class Controller {
 	
 	private static final Logger log = LoggerFactory.getLogger(Controller.class);
+	
 	private static final String FORMAT_ERROR_MESSAGE = "Invalid format type. Can only return JSON!";
 
 	/**
@@ -32,6 +34,7 @@ public class Controller {
 			@RequestParam(value="f", defaultValue="") String formatType) {
 		
 		if(!"json".equalsIgnoreCase(formatType)) {
+			log.warn(FORMAT_ERROR_MESSAGE);
 			return ErrorMessageHandler.getErrorMessage(FORMAT_ERROR_MESSAGE);
 		}
 		
@@ -56,6 +59,7 @@ public class Controller {
 			@RequestParam(value="f", defaultValue="") String formatType) {
 		
 		if(!"json".equalsIgnoreCase(formatType)) {
+			log.warn(FORMAT_ERROR_MESSAGE);
 			return ErrorMessageHandler.getErrorMessage(FORMAT_ERROR_MESSAGE);
 		}
 		
@@ -91,6 +95,7 @@ public class Controller {
 			@RequestParam(value="f", defaultValue="") String formatType) {
 		
 		if(!"json".equalsIgnoreCase(formatType)) {
+			log.warn(FORMAT_ERROR_MESSAGE);
 			return ErrorMessageHandler.getErrorMessage(FORMAT_ERROR_MESSAGE);
 		}
 		

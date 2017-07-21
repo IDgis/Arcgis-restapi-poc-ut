@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.json.JsonParser;
 import org.springframework.boot.json.JsonParserFactory;
 
+import nl.idgis.error.ErrorMessageHandler;
+
 public abstract class MetaDataHandler {
 	
 	private static final Logger log = LoggerFactory.getLogger(MetaDataHandler.class);

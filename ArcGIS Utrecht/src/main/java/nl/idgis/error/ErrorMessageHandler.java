@@ -1,4 +1,4 @@
-package nl.idgis;
+package nl.idgis.error;
 
 import java.util.HashMap;
 import java.util.Map;

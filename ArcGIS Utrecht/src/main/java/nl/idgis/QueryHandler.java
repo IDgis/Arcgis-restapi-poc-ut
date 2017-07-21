@@ -1,60 +1,51 @@
 package nl.idgis;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Properties;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class QueryHandler {
 
-	private String query;
+public static final Logger log = LoggerFactory.getLogger(QueryHandler.class);
 	
-	private int id;
-	private String name;
-	private String serviceItemId;
-	private String geometryType;
-	private int minScale;
-	private int maxScale;
-	private int outSR;
-	
-	public QueryHandler(String query) {
-		this.query = query;
-	}
-	
-	public void executeQuery(int outSR) {
-		id = 0;
-		name = "Meetnet";
-		serviceItemId = "570d1dbbbe834ed89ee88c02e2d42cde";
-		geometryType = "esriGeometryPolyline";
-		minScale = 0;
-		maxScale = 0;
-		this.outSR = outSR;
-	}
-
-	public String getQuery() {
-		return query;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public String getServiceItemId() {
-		return serviceItemId;
-	}
-
-	public String getGeometryType() {
-		return geometryType;
-	}
-
-	public int getMinScale() {
-		return minScale;
-	}
-
-	public int getMaxScale() {
-		return maxScale;
+	public static Map<String, Object> executeQuery(String query, String userName, String password) {
+		Map<String, Object> map = new LinkedHashMap<>();
+		
+		try(Connection con = getConnection(userName, password);
+			PreparedStatement stmt = con.prepareStatement(query)) {
+			
+			ResultSet rs = stmt.executeQuery();
+			
+			while(rs.next()) {
+				ResultSetMetaData rsmd = rs.getMetaData();
+				int numColumns = rsmd.getColumnCount();
+				for(int i = 1; i <= numColumns; i++) {
+					map.put(rsmd.getColumnName(i), rs.getObject(i));
+				}
+			}
+			
+			rs.close();
+		} catch (SQLException e) {
+			log.error(e.getMessage());
+		}
+		return map;
 	}
 	
-	public int getOutSR() {
-		return outSR;
+	private static Connection getConnection(String userName, String password) throws SQLException {
+		//String url = "jdbc:mysql://<host>:<port>/<database_name>";
+		String url = "jdbc:postgresql://192.168.99.100:5432/<database_name>";
+		Properties prop = new Properties();
+		prop.put("user", userName);
+		prop.put("password", password);
+		return DriverManager.getConnection(url, prop);
 	}
 }

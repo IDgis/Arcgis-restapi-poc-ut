@@ -37,7 +37,7 @@ public class Controller {
 		
 		// TODO create json file and add URL
 		MetaDataHandler metaDataHandler = new FeatureServerHandler();
-		log.info(String.format("Getting metadata for serviceName: %s", serviceName));
+		log.debug(String.format("Getting metadata for serviceName: %s", serviceName));
 		return metaDataHandler.getMetadata("examples/featureserver.json");
 	}
 	
@@ -63,17 +63,17 @@ public class Controller {
 		String jsonUrl = null;
 		switch(layerId) {
 		case 0:
-			jsonUrl = "<path-to-layerId-0>";
+			jsonUrl = "examples/featureLayer0.json";
 			break;
 		case 1:
-			jsonUrl = "<path-to-layerId-1>";
+			jsonUrl = "examples/featureLayer1.json";
 			break;
 		default:
 			return ErrorMessageHandler.getErrorMessage("Invalid layer id. Please enter 0 or 1");
 		}
 		
 		MetaDataHandler metaDataHandler = new FeatureLayerHandler();
-		log.info(String.format("Getting metadata for serviceName: %s and layerId: %d", serviceName, layerId));
+		log.debug(String.format("Getting metadata for serviceName: %s and layerId: %d", serviceName, layerId));
 		return metaDataHandler.getMetadata(jsonUrl);
 	}
 	
@@ -95,7 +95,7 @@ public class Controller {
 		}
 		
 		//TODO implement method
-		log.info(String.format("Getting query metadata for serviceName: %s and layerId: %d", serviceName, layerId));
+		log.debug(String.format("Getting query metadata for serviceName: %s and layerId: %d", serviceName, layerId));
 		return null;
 	}
 }

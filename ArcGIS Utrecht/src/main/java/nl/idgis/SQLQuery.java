@@ -17,10 +17,10 @@ public class SQLQuery {
 	
 	public static final Logger log = LoggerFactory.getLogger(SQLQuery.class);
 	
-	public Map<String, Object> executeQuery(String query) {
+	public Map<String, Object> executeQuery(String query, String userName, String password) {
 		Map<String, Object> map = new HashMap<>();
 		
-		try(Connection con = getConnection();
+		try(Connection con = getConnection(userName, password);
 			PreparedStatement stmt = con.prepareStatement(query)) {
 			
 			ResultSet rs = stmt.executeQuery();
@@ -32,17 +32,20 @@ public class SQLQuery {
 					map.put(rsmd.getColumnName(i), rs.getObject(i));
 				}
 			}
+			
+			rs.close();
 		} catch (SQLException e) {
 			log.error(e.getMessage());
 		}
 		return map;
 	}
 	
-	private Connection getConnection() throws SQLException {
-		String url = "jdbc:mysql://<host>:<port>/<database_name>";
+	private Connection getConnection(String userName, String password) throws SQLException {
+		//String url = "jdbc:mysql://<host>:<port>/<database_name>";
+		String url = "jdbc:postgresql://192.168.99.100:5432/<database_name>";
 		Properties prop = new Properties();
-		prop.put("user", "test");
-		prop.put("password", "test");
+		prop.put("user", userName);
+		prop.put("password", password);
 		return DriverManager.getConnection(url, prop);
 	}
 }

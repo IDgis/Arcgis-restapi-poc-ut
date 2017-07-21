@@ -1,7 +1,7 @@
 package nl.idgis;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,9 +16,9 @@ import nl.idgis.featureserver.Layer;
 
 // Geeft aan dat deze class een Controller is waarin urls ge-mapt worden
 @RestController
-public class Controller {
+public class ControllerTest {
 	
-	private static final Logger log = LoggerFactory.getLogger(Controller.class);
+	private static final Logger log = LoggerFactory.getLogger(ControllerTest.class);
 
 	// @RequestParam als bijvoorbeeld: localhost:8080?name=test&version=1.0
 	@RequestMapping("/")
@@ -26,33 +26,37 @@ public class Controller {
 							  @RequestParam(value="version", defaultValue="0.1.0") Object version) {
 		
 		// Creeer een Map die alle json objecten bevat
-		Map<Object, Object> result = new HashMap<>();
+		Map<Object, Object> result = new LinkedHashMap<>();
 		result.put(appName, version);
-		result.put("supportNumbers", true);
+		result.put("Boolean", true);
 		
 		// Een list wordt terug gegeven als een Array
 		List<Object> list = new ArrayList<>();
 		list.add("Test");
 		list.add("One");
 		list.add("Two");
-		result.put("list", list);
+		result.put("ArrayList", list);
 		
 		// Een Array wordt terug gegeven als een Array
 		int[] numbers = new int[]{5, 6, 7};
-		result.put("supportedNumber", numbers);
+		result.put("Array", numbers);
 		
 		// Een Object wordt terug gegeven als een Object
-		result.put("layerInfo", new Object() {
+		result.put("Anonymous Object", new Object() {
 			private String info = "info String";
 			@SuppressWarnings("unused")
 			public String getInfo() { return info; }
 		});
 		
 		// Een Map wordt terug gegeven als een Object
-		Map<Object, Object> mapping = new HashMap<>();
+		Map<Object, Object> mapping = new LinkedHashMap<>();
 		mapping.put("One", 1);
 		mapping.put("Two", 2);
-		result.put("mappings", mapping);
+		List<Object> num = new ArrayList<>();
+		num.add(3);
+		num.add(4);
+		mapping.put("continued", num);
+		result.put("LinkedHashMap", mapping);
 		
 		return result;
 	}
@@ -71,7 +75,7 @@ public class Controller {
 	 * @param outSR - The spatial reference of the returned geometry.
 	 * @return A Json from the values found in the query
 	 */
-	@RequestMapping("/rest/services/{serviceName}/FeatureServer/{featureLayerId}/query")
+	@RequestMapping("/services/{serviceName}/FeatureServer/{featureLayerId}/query")
 	public Layer getQuery(@RequestParam(value="f", defaultValue="json") String formatType,
 						  @RequestParam(value="where", defaultValue="") String where,
 						  @RequestParam(value="returnGeometry", defaultValue="true") boolean returnGeometry,
@@ -102,7 +106,7 @@ public class Controller {
 	}
 	
 	// @PathVariable pakt de variabelen tussen {} uit de url
-	@RequestMapping("/rest/services/{serviceName}/FeatureServer/{featureLayerId}")
+	@RequestMapping("/services/{serviceName}/FeatureServer/{featureLayerId}")
 	public void getVal(@PathVariable String serviceName, @PathVariable String featureLayerId) {
 		log.info(String.format("serviceName: %s, featureLayerId: %s", serviceName, featureLayerId));
 	}

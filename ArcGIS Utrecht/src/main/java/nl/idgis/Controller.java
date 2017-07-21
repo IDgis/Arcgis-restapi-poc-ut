@@ -150,12 +150,12 @@ public class Controller {
 		
 		// Create a valid query String from the specified parameters
 		log.debug("Parsing attributes to create a valifd query...");
-		QueryParser parser = new QueryParser(params);
+		QueryBuilder parser = new QueryBuilder(params);
 		parser.createValidQuery();
 		String query = parser.getQuery();
 		log.debug("Got a valid query. Sending query to database...");
 		
 		// Post the query to the database to get all properties and return them in json;
-		return QueryHandler.executeQuery(query, "user", "password");
+		return QueryHandler.executeQuery(query, "test", "test");
 	}
 }

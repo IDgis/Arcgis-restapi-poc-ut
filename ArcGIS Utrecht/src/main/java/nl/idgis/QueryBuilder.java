@@ -5,9 +5,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class QueryParser {
+public class QueryBuilder {
 
-	private static final Logger log = LoggerFactory.getLogger(QueryParser.class);
+	private static final Logger log = LoggerFactory.getLogger(QueryBuilder.class);
 	
 	private static final String TABLE_NAME = "";
 	
@@ -15,7 +15,7 @@ public class QueryParser {
 	private String query;
 	
 	
-	public QueryParser(Map<String, Object> params) {
+	public QueryBuilder(Map<String, Object> params) {
 		queryParams = params;
 	}
 	

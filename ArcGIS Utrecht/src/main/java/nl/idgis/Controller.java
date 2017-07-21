@@ -41,7 +41,7 @@ public class Controller {
 		
 		MetaDataHandler metaDataHandler = new FeatureServerHandler();
 		log.debug(String.format("Getting metadata for serviceName: %s", serviceName));
-		return metaDataHandler.getMetadata("examples/featureserver.json");
+		return metaDataHandler.getMetadata("./examples/featureserver.json");
 	}
 	
 	/**
@@ -66,10 +66,10 @@ public class Controller {
 		String jsonUrl = null;
 		switch(layerId) {
 		case 0:
-			jsonUrl = "examples/featureLayer0.json";
+			jsonUrl = "./examples/featureLayer0.json";
 			break;
 		case 1:
-			jsonUrl = "examples/featureLayer1.json";
+			jsonUrl = "./examples/featureLayer1.json";
 			break;
 		default:
 			return ErrorMessageHandler.getErrorMessage("Invalid layer id. Please enter 0 or 1");
@@ -137,6 +137,7 @@ public class Controller {
 		}
 		
 		// Map all attributes to create a query to the database
+		log.debug("Mapping all attributes from URL...");
 		Map<String, Object> params = new HashMap<>();
 		params.put("where", where);
 		params.put("returnGeometry", returnGeometry);
@@ -148,12 +149,13 @@ public class Controller {
 		params.put("quantizationParameters", quantizationParameters);
 		
 		// Create a valid query String from the specified parameters
+		log.debug("Parsing attributes to create a valifd query...");
 		QueryParser parser = new QueryParser(params);
 		parser.createValidQuery();
 		String query = parser.getQuery();
+		log.debug("Got a valid query. Sending query to database...");
 		
-		// Post the query to the database to get all properties and return them in json
-		log.debug(String.format("Getting query metadata for serviceName: %s and layerId: %d", serviceName, layerId));
+		// Post the query to the database to get all properties and return them in json;
 		return QueryHandler.executeQuery(query, "user", "password");
 	}
 }

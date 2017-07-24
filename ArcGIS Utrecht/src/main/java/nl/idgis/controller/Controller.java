@@ -1,6 +1,7 @@
 package nl.idgis.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -28,6 +29,9 @@ public class Controller {
 	
 	@Autowired
 	private QueryBuilder builder;
+	
+	@Autowired
+	private QueryHandler handler;
 
 	/**
 	 * This mapping gets the metadata for the FeatureServer. If an invalid format type is given, it will give
@@ -125,7 +129,7 @@ public class Controller {
 	 * @return The metadata for the specified query in JSON
 	 */
 	@RequestMapping("/{serviceName}/FeatureServer/{layerId}/query")
-	public Map<String, Object> getQueryResult(
+	public List<Map<String, Object>> getQueryResult(
 			@PathVariable String serviceName,
 			@PathVariable int layerId,
 			@RequestParam(value="f", defaultValue="html") String formatType,
@@ -138,10 +142,10 @@ public class Controller {
 			@RequestParam(value="resultRecordCount", defaultValue="0") int resultRecordCount,
 			@RequestParam(value="quantizationParameters", defaultValue="") String quantizationParameters) {
 		
-		if(!"json".equalsIgnoreCase(formatType)) {
+		/*if(!"json".equalsIgnoreCase(formatType)) {
 			log.warn(FORMAT_ERROR_MESSAGE);
 			return ErrorMessageHandler.getErrorMessage(FORMAT_ERROR_MESSAGE);
-		}
+		}*/
 		
 		// Map all attributes to create a query to the database
 		log.debug("Mapping all attributes from URL...");
@@ -161,6 +165,6 @@ public class Controller {
 		log.debug("Got a valid query. Sending query to database...");
 		
 		// Post the query to the database to get all properties and return them in json;
-		return QueryHandler.executeQuery(query, "publisher", "publisher");
+		return handler.executeTemplateQuery("SELECT * FROM data_source");
 	}
 }

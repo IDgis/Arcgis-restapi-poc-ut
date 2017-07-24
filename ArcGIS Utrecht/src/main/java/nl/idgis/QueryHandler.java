@@ -1,22 +1,31 @@
 package nl.idgis;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
 
+@Component
 public class QueryHandler {
 
-public static final Logger log = LoggerFactory.getLogger(QueryHandler.class);
+	private static final Logger log = LoggerFactory.getLogger(QueryHandler.class);
 	
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
+	
+	
+	public List<Map<String, Object>> executeTemplateQuery(String query) {
+		log.debug(String.format("Entered query: %s", query));
+		
+		// execute a prepared statement
+		return jdbcTemplate.queryForList(query);
+	}
+	
+	/*
 	public static Map<String, Object> executeQuery(String query, String userName, String password) {
 		Map<String, Object> map = new LinkedHashMap<>();
 		
@@ -48,4 +57,5 @@ public static final Logger log = LoggerFactory.getLogger(QueryHandler.class);
 		prop.put("password", password);
 		return DriverManager.getConnection(url, prop);
 	}
+	*/
 }

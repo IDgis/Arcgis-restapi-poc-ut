@@ -1,6 +1,5 @@
 package nl.idgis.controller;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -25,6 +24,7 @@ public class Controller {
 	private static final Logger log = LoggerFactory.getLogger(Controller.class);
 	
 	private static final String FORMAT_ERROR_MESSAGE = "Invalid format type. Can only return JSON!";
+	private static final String OUTFIELDS_ERROR_MESSAGE = "'outFields' attribute is missing in URL!";
 	
 	@Autowired
 	private QueryBuilder builder;
@@ -145,7 +145,12 @@ public class Controller {
 			log.warn(FORMAT_ERROR_MESSAGE);
 			return ErrorMessageHandler.getErrorMessage(FORMAT_ERROR_MESSAGE);
 		}
+		if("".equals(outFields)) {
+			log.warn(OUTFIELDS_ERROR_MESSAGE);
+			return ErrorMessageHandler.getErrorMessage(OUTFIELDS_ERROR_MESSAGE);
+		}
 		
+		/*
 		// Map all attributes to create a query to the database
 		log.debug("Mapping all attributes from URL...");
 		Map<String, Object> params = new HashMap<>();
@@ -157,15 +162,12 @@ public class Controller {
 		params.put("resultOffset", resultOffset);
 		params.put("resultRecordCount", resultRecordCount);
 		params.put("quantizationParameters", quantizationParameters);
+		*/
 		
+		log.debug("Creating prepared statement from attributes...");
+		String query = builder.createPreparedStatement(outFields, where);
 		
-		
-		// Create a valid query String from the specified parameters
-		log.debug("Parsing attributes to create a valid query...");
-		String query = builder.createValidQuery(params);
-		log.debug("Got a valid query. Sending query to database...");
-		
-		// Post the query to the database to get all properties and return them in json;
-		return handler.executeQuery(query);
+		log.debug("Got a valid query. Querying to database...");
+		return handler.executePreparedStatementQuery(query);
 	}
 }

@@ -1,7 +1,5 @@
 package nl.idgis;
 
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -11,61 +9,55 @@ public class QueryBuilder {
 
 	private static final Logger log = LoggerFactory.getLogger(QueryBuilder.class);
 	
-	private static final String TABLE_NAME = "constants";
+	private static final String TABLE_NAME1 = "constants";
+	private static final String TABLE_NAME2 = "data_source";
+	private static final String TABLE_NAME3 = "source_dataset";
 	
-	public String createPreparedStatement() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("SELECT ? FROM constants");
-		
-		return builder.toString();
-	}
-	
-	public String createValidQuery(Map<String, Object> params) {
+	public String createPreparedStatement(String outFields, String where) {
 		// Create a StringBuilder to create a query
-		log.debug("Building query...");
 		StringBuilder builder = new StringBuilder();
 		builder.append("SELECT ");
 		
 		// Check for outFields to select the columns to return
-		String[] outFields = ((String)params.get("outFields")).split(",");
-		log.debug((String)params.get("outFields"));
-		if(outFields.length > 0) {
-			log.debug("'outFields' attributes found...");
-			builder.append(processOutFields(outFields));
-		}
-		
-		builder.append("FROM ");
-		
-		// Get the table name
-		log.debug("Getting table name...");
-		builder.append(TABLE_NAME + " ");
+		log.debug(String.format("outFields: %s", outFields));
+		builder.append(processOutFieldsParameter(outFields));
+		builder.append(String.format("FROM %s ", TABLE_NAME3));
 		
 		// Check for where parameter
-		String where = (String)params.get("where");
-		if(!"".equals(where)) {
-			log.debug("'where' attributes found...");
-		}
+		log.debug(String.format("where: %s", where));
+		builder.append(processWhereParameter(where));
 		
-		log.debug(String.format("QueryString: %s", builder.toString()));
 		return builder.toString();
 	}
 	
 	/**
-	 * Go through the String[] to get all columns to filter from the table
+	 * Go through the String and seperate at the comma to get all columns to filter from the table
 	 * @param outFields - The column names. A * for all columns
 	 * @return
 	 */
-	private String processOutFields(String[] outFields) {
-		if("*".equals(outFields[0])) {
+	private String processOutFieldsParameter(String outFields) {
+		String[] outFieldsArray = outFields.split(",");
+		if("*".equals(outFieldsArray[0])) {
 			return "* ";
 		}
 		StringBuilder builder = new StringBuilder();
-		for(String s : outFields) {
+		for(String s : outFieldsArray) {
 			builder.append(s + ", ");
 		}
 		// Remove the final comma
 		builder.deleteCharAt(builder.length() - 2);
-		builder.append("");
+		
+		return builder.toString();
+	}
+	
+	private String processWhereParameter(String where) {
+		if("".equals(where)) {
+			return "";
+		}
+		
+		StringBuilder builder = new StringBuilder();
+		builder.append("WHERE ");
+		builder.append(where + " ");
 		
 		return builder.toString();
 	}

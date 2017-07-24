@@ -11,11 +11,13 @@ public class QueryBuilder {
 
 	private static final Logger log = LoggerFactory.getLogger(QueryBuilder.class);
 	
-	private static final String TABLE_NAME = "publisher.constants";
+	private static final String TABLE_NAME = "constants";
 	
-	
-	public QueryBuilder() {
-		// Empty constructor
+	public String createPreparedStatement() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("SELECT ? FROM constants");
+		
+		return builder.toString();
 	}
 	
 	public String createValidQuery(Map<String, Object> params) {
@@ -25,11 +27,14 @@ public class QueryBuilder {
 		builder.append("SELECT ");
 		
 		// Check for outFields to select the columns to return
-		String[] outFields = (String[])params.get("outFields");
+		String[] outFields = ((String)params.get("outFields")).split(",");
+		log.debug((String)params.get("outFields"));
 		if(outFields.length > 0) {
 			log.debug("'outFields' attributes found...");
 			builder.append(processOutFields(outFields));
 		}
+		
+		builder.append("FROM ");
 		
 		// Get the table name
 		log.debug("Getting table name...");
@@ -52,7 +57,7 @@ public class QueryBuilder {
 	 */
 	private String processOutFields(String[] outFields) {
 		if("*".equals(outFields[0])) {
-			return "* FROM ";
+			return "* ";
 		}
 		StringBuilder builder = new StringBuilder();
 		for(String s : outFields) {
@@ -60,7 +65,7 @@ public class QueryBuilder {
 		}
 		// Remove the final comma
 		builder.deleteCharAt(builder.length() - 2);
-		builder.append("FROM ");
+		builder.append("");
 		
 		return builder.toString();
 	}

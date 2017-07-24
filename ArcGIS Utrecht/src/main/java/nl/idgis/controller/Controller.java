@@ -1,7 +1,6 @@
 package nl.idgis.controller;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -129,23 +128,23 @@ public class Controller {
 	 * @return The metadata for the specified query in JSON
 	 */
 	@RequestMapping("/{serviceName}/FeatureServer/{layerId}/query")
-	public List<Map<String, Object>> getQueryResult(
+	public Map<String, Object> getQueryResult(
 			@PathVariable String serviceName,
 			@PathVariable int layerId,
 			@RequestParam(value="f", defaultValue="html") String formatType,
 			@RequestParam(value="where", defaultValue="") String where,
 			@RequestParam(value="returnGeometry", defaultValue="true") boolean returnGeometry,
 			@RequestParam(value="spatialRel", defaultValue="esriSpatialRelIntersects") String spatialRel,
-			@RequestParam(value="outFields", defaultValue="") String[] outFields,
+			@RequestParam(value="outFields", defaultValue="") String outFields,
 			@RequestParam(value="outSR", defaultValue="0") long outSR,
 			@RequestParam(value="resultOffset", defaultValue="0") int resultOffset,
 			@RequestParam(value="resultRecordCount", defaultValue="0") int resultRecordCount,
 			@RequestParam(value="quantizationParameters", defaultValue="") String quantizationParameters) {
 		
-		/*if(!"json".equalsIgnoreCase(formatType)) {
+		if(!"json".equalsIgnoreCase(formatType)) {
 			log.warn(FORMAT_ERROR_MESSAGE);
 			return ErrorMessageHandler.getErrorMessage(FORMAT_ERROR_MESSAGE);
-		}*/
+		}
 		
 		// Map all attributes to create a query to the database
 		log.debug("Mapping all attributes from URL...");
@@ -159,12 +158,14 @@ public class Controller {
 		params.put("resultRecordCount", resultRecordCount);
 		params.put("quantizationParameters", quantizationParameters);
 		
+		
+		
 		// Create a valid query String from the specified parameters
-		log.debug("Parsing attributes to create a valifd query...");
+		log.debug("Parsing attributes to create a valid query...");
 		String query = builder.createValidQuery(params);
 		log.debug("Got a valid query. Sending query to database...");
 		
 		// Post the query to the database to get all properties and return them in json;
-		return handler.executeTemplateQuery("SELECT * FROM data_source");
+		return handler.executeQuery(query);
 	}
 }

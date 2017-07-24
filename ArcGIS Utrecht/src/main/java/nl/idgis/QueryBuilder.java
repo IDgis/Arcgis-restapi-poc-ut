@@ -4,29 +4,28 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+@Component
 public class QueryBuilder {
 
 	private static final Logger log = LoggerFactory.getLogger(QueryBuilder.class);
 	
-	private static final String TABLE_NAME = "";
-	
-	private Map<String, Object> queryParams;
-	private String query;
+	private static final String TABLE_NAME = "publisher.constants";
 	
 	
-	public QueryBuilder(Map<String, Object> params) {
-		queryParams = params;
+	public QueryBuilder() {
+		// Empty constructor
 	}
 	
-	public void createValidQuery() {
+	public String createValidQuery(Map<String, Object> params) {
 		// Create a StringBuilder to create a query
 		log.debug("Building query...");
 		StringBuilder builder = new StringBuilder();
 		builder.append("SELECT ");
 		
 		// Check for outFields to select the columns to return
-		String[] outFields = (String[])queryParams.get("outFields");
+		String[] outFields = (String[])params.get("outFields");
 		if(outFields.length > 0) {
 			log.debug("'outFields' attributes found...");
 			builder.append(processOutFields(outFields));
@@ -37,12 +36,13 @@ public class QueryBuilder {
 		builder.append(TABLE_NAME + " ");
 		
 		// Check for where parameter
-		String where = (String)queryParams.get("where");
+		String where = (String)params.get("where");
 		if(!"".equals(where)) {
 			log.debug("'where' attributes found...");
 		}
 		
-		query = builder.toString();
+		log.debug(String.format("QueryString: %s", builder.toString()));
+		return builder.toString();
 	}
 	
 	/**
@@ -63,9 +63,5 @@ public class QueryBuilder {
 		builder.append("FROM ");
 		
 		return builder.toString();
-	}
-	
-	public String getQuery() {
-		return query;
 	}
 }

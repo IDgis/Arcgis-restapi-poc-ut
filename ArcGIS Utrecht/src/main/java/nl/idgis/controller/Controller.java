@@ -1,16 +1,20 @@
-package nl.idgis;
+package nl.idgis.controller;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import nl.idgis.error.ErrorMessageHandler;
+import nl.idgis.ErrorMessageHandler;
+import nl.idgis.MetaDataHandler;
+import nl.idgis.QueryBuilder;
+import nl.idgis.QueryHandler;
 import nl.idgis.featurelayer.FeatureLayerHandler;
 import nl.idgis.featureserver.FeatureServerHandler;
 
@@ -21,6 +25,9 @@ public class Controller {
 	private static final Logger log = LoggerFactory.getLogger(Controller.class);
 	
 	private static final String FORMAT_ERROR_MESSAGE = "Invalid format type. Can only return JSON!";
+	
+	@Autowired
+	private QueryBuilder builder;
 
 	/**
 	 * This mapping gets the metadata for the FeatureServer. If an invalid format type is given, it will give
@@ -126,10 +133,10 @@ public class Controller {
 			@RequestParam(value="returnGeometry", defaultValue="true") boolean returnGeometry,
 			@RequestParam(value="spatialRel", defaultValue="esriSpatialRelIntersects") String spatialRel,
 			@RequestParam(value="outFields", defaultValue="") String[] outFields,
-			@RequestParam(value="outSR", defaultValue="") long outSR,
+			@RequestParam(value="outSR", defaultValue="0") long outSR,
 			@RequestParam(value="resultOffset", defaultValue="0") int resultOffset,
-			@RequestParam(value="resultRecordCount", defaultValue="") int resultRecordCount,
-			@RequestParam(value="quantizationParameters", defaultValue="") Object quantizationParameters) {
+			@RequestParam(value="resultRecordCount", defaultValue="0") int resultRecordCount,
+			@RequestParam(value="quantizationParameters", defaultValue="") String quantizationParameters) {
 		
 		if(!"json".equalsIgnoreCase(formatType)) {
 			log.warn(FORMAT_ERROR_MESSAGE);
@@ -150,12 +157,10 @@ public class Controller {
 		
 		// Create a valid query String from the specified parameters
 		log.debug("Parsing attributes to create a valifd query...");
-		QueryBuilder parser = new QueryBuilder(params);
-		parser.createValidQuery();
-		String query = parser.getQuery();
+		String query = builder.createValidQuery(params);
 		log.debug("Got a valid query. Sending query to database...");
 		
 		// Post the query to the database to get all properties and return them in json;
-		return QueryHandler.executeQuery(query, "test", "test");
+		return QueryHandler.executeQuery(query, "publisher", "publisher");
 	}
 }

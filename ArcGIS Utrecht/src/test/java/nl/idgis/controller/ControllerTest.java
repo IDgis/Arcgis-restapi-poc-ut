@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import nl.idgis.QueryBuilder;
+import nl.idgis.QueryBuilderOld;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(value = Controller.class, secure = false)
@@ -23,7 +23,7 @@ public class ControllerTest {
 	private MockMvc mockMvc;
 	
 	@MockBean
-	private QueryBuilder builder;
+	private QueryBuilderOld builder;
 	
 	/**
 	 * Test whether an invalid format type returns an error message or not.

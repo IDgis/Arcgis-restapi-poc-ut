@@ -1,169 +1,151 @@
 {
-  "currentVersion" : 10.51, 
-  "id" : 0, 
-  "name" : "BAG punt voor analyse", 
-  "type" : "Feature Layer", 
-  "serviceItemId" : "72bba1b304c6403dba7732d4bfb811be", 
-  "displayField" : "STATUS", 
-  "description" : "", 
-  "copyrightText" : "", 
-  "defaultVisibility" : true, 
-  "editingInfo" : {
-    "lastEditDate" : null
-  }, 
-  "relationships" : [], 
-  "isDataVersioned" : false, 
-  "supportsCalculate" : true, 
-  "supportsTruncate" : true, 
-  "supportsAttachmentsByUploadId" : true, 
-  "supportsRollbackOnFailureParameter" : true, 
-  "supportsStatistics" : true, 
-  "supportsAdvancedQueries" : true, 
-  "supportsValidateSql" : true, 
-  "supportsCoordinatesQuantization" : true, 
-  "supportsApplyEditsWithGlobalIds" : false, 
-  "advancedQueryCapabilities" : {
-    "supportsPagination" : true, 
-    "supportsPaginationOnAggregatedQueries" : true, 
-    "supportsQueryRelatedPagination" : true, 
-    "supportsQueryWithDistance" : true, 
-    "supportsReturningQueryExtent" : true, 
-    "supportsStatistics" : true, 
-    "supportsOrderBy" : true, 
-    "supportsDistinct" : true, 
-    "supportsQueryWithResultType" : true, 
-    "supportsSqlExpression" : true, 
-    "supportsAdvancedQueryRelated" : true, 
-    "supportsReturningGeometryCentroid" : false, 
-    "supportsQueryWithDatumTransformation" : true
-  }, 
-  "useStandardizedQueries" : false, 
-  "geometryType" : "esriGeometryPoint", 
-  "minScale" : 0, 
-  "maxScale" : 0, 
-  "extent" : {
-    "xmin" : 0, 
-    "ymin" : 0, 
-    "xmax" : 169976.86899999902, 
-    "ymax" : 478291.78700000048, 
-    "spatialReference" : {
-      "wkid" : 28992, 
-      "latestWkid" : 28992
-    }
-  }, 
-  "drawingInfo":{"renderer":{"type":"simple","symbol":{"type":"esriPMS","url":"af47ea1df9928c3d5a562f098b45cdec","imageData":"iVBORw0KGgoAAAANSUhEUgAAAAsAAAALCAYAAACprHcmAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAPNJREFUGJV10TFLlXEUB+BnuHGauvBud8u15eIQtEsFTQ26NQThNxBnXaIP4CJyhyAu1dDY1BDo4iw2tb9D8gdBhB+UuPjCm+gPznQeDodzJm6l67rV1toTXOIIf4beZOQeY9lae4BjPMJeVS2S7OBqwB1+YAefRgOmSb5U1Yck2xOoqm0sk4whnGM9ySn2J5DkFV7f3v8mF1X1LcmLYY0pzu7BkpxhOuDfVTVPcniPn+PrgA+S7OI5/o1V13VPW2vP8HbAn7GG77PZbKvv+xM8xEZr7X1VvUlyOb7zJt71ff8RK/iLn3iZ5Bf/PwUWN3VnrgGSNFloEoNIsgAAAABJRU5ErkJggg==","contentType":"image/png","width":8,"height":8,"angle":0,"xoffset":0,"yoffset":0},"label":"","description":""},"transparency":0,"labelingInfo":null}, 
-  "allowGeometryUpdates" : true, 
-  "hasAttachments" : false, 
-  "htmlPopupType" : "esriServerHTMLPopupTypeAsHTMLText", 
-  "hasM" : false, 
-  "hasZ" : false, 
-  "objectIdField" : "OBJECTID", 
-  "globalIdField" : "", 
-  "typeIdField" : "", 
-  "fields" : [
-    {
-      "name" : "OBJECTID", 
-      "type" : "esriFieldTypeOID", 
-      "alias" : "OBJECTID", 
-      "sqlType" : "sqlTypeOther", 
-      "nullable" : false, 
-      "editable" : false, 
-      "domain" : null, 
-      "defaultValue" : null
-    }, 
-    {
-      "name" : "OPPERVLAKTE", 
-      "type" : "esriFieldTypeInteger", 
-      "alias" : "OPPERVLAKTE", 
-      "sqlType" : "sqlTypeOther", 
-      "nullable" : true, 
-      "editable" : true, 
-      "domain" : null, 
-      "defaultValue" : null
-    }, 
-    {
-      "name" : "STATUS", 
-      "type" : "esriFieldTypeString", 
-      "alias" : "STATUS", 
-      "sqlType" : "sqlTypeOther", 
-      "length" : 80, 
-      "nullable" : true, 
-      "editable" : true, 
-      "domain" : null, 
-      "defaultValue" : null
-    }, 
-    {
-      "name" : "GEBRUIKSDOEL", 
-      "type" : "esriFieldTypeString", 
-      "alias" : "GEBRUIKSDOEL", 
-      "sqlType" : "sqlTypeOther", 
-      "length" : 255, 
-      "nullable" : true, 
-      "editable" : true, 
-      "domain" : null, 
-      "defaultValue" : null
-    }, 
-    {
-      "name" : "WINKELGEBIED", 
-      "type" : "esriFieldTypeString", 
-      "alias" : "WINKELGEBIED", 
-      "sqlType" : "sqlTypeOther", 
-      "length" : 50, 
-      "nullable" : true, 
-      "editable" : true, 
-      "domain" : null, 
-      "defaultValue" : null
-    }, 
-    {
-      "name" : "OMSCHRIJVI", 
-      "type" : "esriFieldTypeString", 
-      "alias" : "OMSCHRIJVI", 
-      "sqlType" : "sqlTypeOther", 
-      "length" : 28, 
-      "nullable" : true, 
-      "editable" : true, 
-      "domain" : null, 
-      "defaultValue" : null
-    }
-  ], 
-  "indexes" : [
-    {
-      "name" : "PK__DETAILHA__F4B70D85BB5765DC", 
-      "fields" : "OBJECTID", 
-      "isAscending" : true, 
-      "isUnique" : true, 
-      "description" : "clustered, unique, primary key"
-    }, 
-    {
-      "name" : "user_3734.DETAILHANDEL_BAG_PUNT_VOOR_ANALYSE_Shape_sidx", 
-      "fields" : "Shape", 
-      "isAscending" : false, 
-      "isUnique" : false, 
-      "description" : "Shape Index"
-    }
-  ], 
-  "types" : [], 
-  "templates" : [
-    {
-      "name" : "BAG punt voor analyse", 
-      "description" : "", 
-      "drawingTool" : "esriFeatureEditToolPoint", 
-      "prototype" : {
-        "attributes" : {
-          "OMSCHRIJVI" : null, 
-          "OPPERVLAKTE" : null, 
-          "STATUS" : null, 
-          "GEBRUIKSDOEL" : null, 
-          "WINKELGEBIED" : null
-        }
-      }
-    }
-  ], 
-  "supportedQueryFormats" : "JSON, geoJSON", 
-  "hasStaticData" : false, 
-  "maxRecordCount" : 1000, 
-  "standardMaxRecordCount" : 32000, 
-  "tileMaxRecordCount" : 8000, 
-  "maxRecordCountFactor" : 1, 
-  "capabilities" : "Create,Delete,Query,Update,Editing"
+	"currentVersion": 10.51,
+	"id": 0,
+	"name": "Aardkundige waarden",
+	"type": "Feature Layer",
+	"serviceItemId": "edf6d445a5524f7a8739241986ee3bfc",
+	"displayField": "NAAM",
+	"description": "",
+	"copyrightText": "",
+	"defaultVisibility": true,
+	"editingInfo": {
+		"lastEditDate": null
+	},
+	"relationships": [],
+	"isDataVersioned": false,
+	"supportsCalculate": false,
+	"supportsTruncate": false,
+	"supportsAttachmentsByUploadId": false,
+	"supportsRollbackOnFailureParameter": false,
+	"supportsStatistics": false,
+	"supportsAdvancedQueries": false,
+	"supportsValidateSql": false,
+	"supportsCoordinatesQuantization": false,
+	"supportsApplyEditsWithGlobalIds": false,
+	"advancedQueryCapabilities": {
+		"supportsPagination": true,
+		"supportsPaginationOnAggregatedQueries": true,
+		"supportsQueryRelatedPagination": true,
+		"supportsQueryWithDistance": true,
+		"supportsReturningQueryExtent": true,
+		"supportsStatistics": true,
+		"supportsOrderBy": true,
+		"supportsDistinct": true,
+		"supportsQueryWithResultType": true,
+		"supportsSqlExpression": true,
+		"supportsAdvancedQueryRelated": true,
+		"supportsReturningGeometryCentroid": false,
+		"supportsQueryWithDatumTransformation": true
+	},
+	"useStandardizedQueries": false,
+	"geometryType": "esriGeometryPolygon",
+	"minScale": 0,
+	"maxScale": 0,
+	"extent": {
+		"xmin": 117611.407699998,
+		"ymin": 438911.175299998,
+		"xmax": 170176.851100001,
+		"ymax": 476935.7403,
+		"spatialReference": {
+			"wkid": 28992,
+			"latestWkid": 28992
+		}
+	},
+	"drawingInfo": {
+		"renderer": {
+			"type": "simple",
+			"symbol": {
+				"type": "esriSFS",
+				"style": "esriSFSSolid",
+				"color": [
+					0,
+					0,
+					0,
+					0
+				],
+				"outline": {
+					"type": "esriSLS",
+					"style": "esriSLSSolid",
+					"color": [
+						0,
+						0,
+						0,
+						255
+					],
+					"width": 0.40000000000000002
+				}
+			},
+			"label": "",
+			"description": ""
+		},
+		"transparency": 0,
+		"labelingInfo": null
+	},
+	"allowGeometryUpdates": false,
+	"hasAttachments": false,
+	"htmlPopupType": "esriServerHTMLPopupTypeAsHTMLText",
+	"hasM": false,
+	"hasZ": false,
+	"objectIdField": "OBJECTID",
+	"globalIdField": "",
+	"typeIdField": "",
+	"fields": [
+		{
+			"name": "OBJECTID",
+			"type": "esriFieldTypeOID",
+			"alias": "OBJECTID",
+			"sqlType": "sqlTypeOther",
+			"nullable": false,
+			"editable": false,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "NAAM",
+			"type": "esriFieldTypeString",
+			"alias": "Naam",
+			"sqlType": "sqlTypeOther",
+			"length": 254,
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		}
+	],
+	"indexes": [
+		{
+			"name": "FDO_OBJECTID",
+			"fields": "OBJECTID",
+			"isAscending": true,
+			"isUnique": true,
+			"description": ""
+		},
+		{
+			"name": "FDO_SHAPE",
+			"fields": "SHAPE",
+			"isAscending": true,
+			"isUnique": false,
+			"description": ""
+		}
+	],
+	"types": [],
+	"templates": [
+		{
+			"name": "Aardkundige Waarden",
+			"description": "",
+			"drawingTool": "esriFeatureEditToolPoint",
+			"prototype": {
+				"attributes": {
+					"NAAM": null
+				}
+			}
+		}
+	],
+	"supportedQueryFormats": "JSON, geoJSON",
+	"hasStaticData": false,
+	"maxRecordCount": 1000,
+	"standardMaxRecordCount": 32000,
+	"tileMaxRecordCount": 8000,
+	"maxRecordCountFactor": 1,
+	"capabilities": "Query"
 }

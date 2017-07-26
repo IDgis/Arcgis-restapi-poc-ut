@@ -1,0 +1,129 @@
+{
+  "objectIdFieldName" : "OBJECTID", 
+  "globalIdFieldName" : "", 
+  "geometryType" : "esriGeometryPoint", 
+  "spatialReference" : {
+    "wkid" : 102100, 
+    "latestWkid" : 3857
+  }, 
+  "fields" : [
+    {
+      "name" : "OBJECTID", 
+      "type" : "esriFieldTypeOID", 
+      "alias" : "OBJECTID", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "NAAM", 
+      "type" : "esriFieldTypeString", 
+      "alias" : "NAAM", 
+      "sqlType" : "sqlTypeOther", 
+      "length" : 100, 
+      "domain" : null, 
+      "defaultValue" : null
+    }
+  ], 
+  "features" : [
+    {
+      "attributes" : {
+        "OBJECTID" : 1, 
+        "NAAM" : "P + R de Uithof"
+      }, 
+      "geometry" : 
+      {
+        "x" : 576447.37268082541, 
+        "y" : 6816719.8607776444
+      }
+    }, 
+    {
+      "attributes" : {
+        "OBJECTID" : 2, 
+        "NAAM" : "WKZ"
+      }, 
+      "geometry" : 
+      {
+        "x" : 577010.40283436573, 
+        "y" : 6816210.2778833974
+      }
+    }, 
+    {
+      "attributes" : {
+        "OBJECTID" : 3, 
+        "NAAM" : "UMC"
+      }, 
+      "geometry" : 
+      {
+        "x" : 576524.353142371, 
+        "y" : 6815517.2525112526
+      }
+    }, 
+    {
+      "attributes" : {
+        "OBJECTID" : 4, 
+        "NAAM" : "Heidelberglaan"
+      }, 
+      "geometry" : 
+      {
+        "x" : 575918.74114660418, 
+        "y" : 6815486.5805072859
+      }
+    }, 
+    {
+      "attributes" : {
+        "OBJECTID" : 5, 
+        "NAAM" : "Padualaan"
+      }, 
+      "geometry" : 
+      {
+        "x" : 575182.69265538745, 
+        "y" : 6815482.003221374
+      }
+    }, 
+    {
+      "attributes" : {
+        "OBJECTID" : 6, 
+        "NAAM" : "Kromme RIjn"
+      }, 
+      "geometry" : 
+      {
+        "x" : 574073.21790525713, 
+        "y" : 6815255.2354252888
+      }
+    }, 
+    {
+      "attributes" : {
+        "OBJECTID" : 7, 
+        "NAAM" : "Galgenwaard"
+      }, 
+      "geometry" : 
+      {
+        "x" : 573262.64159214706, 
+        "y" : 6814551.6281631207
+      }
+    }, 
+    {
+      "attributes" : {
+        "OBJECTID" : 8, 
+        "NAAM" : "Vaartsche RIjn"
+      }, 
+      "geometry" : 
+      {
+        "x" : 570250.85631237377, 
+        "y" : 6814426.0849528778
+      }
+    }, 
+    {
+      "attributes" : {
+        "OBJECTID" : 9, 
+        "NAAM" : "Utrecht centraal centrumzijde"
+      }, 
+      "geometry" : 
+      {
+        "x" : 568994.68146281026, 
+        "y" : 6816312.2612320911
+      }
+    }
+  ]
+}

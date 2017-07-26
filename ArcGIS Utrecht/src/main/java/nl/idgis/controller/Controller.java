@@ -1,5 +1,6 @@
 package nl.idgis.controller;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -12,25 +13,52 @@ import org.springframework.web.bind.annotation.RestController;
 
 import nl.idgis.ErrorMessageHandler;
 import nl.idgis.MetaDataHandler;
-import nl.idgis.QueryBuilder;
 import nl.idgis.QueryHandler;
 import nl.idgis.featurelayer.FeatureLayerHandler;
 import nl.idgis.featureserver.FeatureServerHandler;
+import nl.idgis.query.QueryBuilder;
 
 @RestController
-@RequestMapping("/rest/services")
+@RequestMapping("/ArcGIS/rest")
 public class Controller {
 	
 	private static final Logger log = LoggerFactory.getLogger(Controller.class);
 	
 	private static final String FORMAT_ERROR_MESSAGE = "Invalid format type. Can only return JSON!";
-	private static final String OUTFIELDS_ERROR_MESSAGE = "'outFields' attribute is missing in URL!";
 	
 	@Autowired
 	private QueryBuilder builder;
 	
 	@Autowired
 	private QueryHandler handler;
+	
+	/**
+	 * The ServerInfo resource provides general information about the server (e.g. current version of the server), 
+	 * and provides information on whether the server is secured using token based authentication; and the token 
+	 * services url (if token based authentication is used).
+	 * 
+	 * @param formatType
+	 * @return
+	 */
+	@RequestMapping("/info")
+	public Map<String, Object> getServerInfo(
+			@RequestParam(value="f", defaultValue="json") String formatType) {
+		
+		if(!"json".equalsIgnoreCase(formatType)) {
+			log.warn(FORMAT_ERROR_MESSAGE);
+			return ErrorMessageHandler.getErrorMessage(FORMAT_ERROR_MESSAGE);
+		}
+		
+		Map<String, Object> returnMap = new LinkedHashMap<>();
+		returnMap.put("currentVersion", 10.51);
+		returnMap.put("owningSystemUrl", "http://localhost:8090");
+		
+		Map<String, Object> authInfo = new LinkedHashMap<>();
+		authInfo.put("isTokenBasedSecurity", false);
+		returnMap.put("authInfo", authInfo);
+		
+		return returnMap;
+	}
 
 	/**
 	 * This mapping gets the metadata for the FeatureServer. If an invalid format type is given, it will give
@@ -39,10 +67,10 @@ public class Controller {
 	 * @param formatType - The return type for the metadata. Only json is available.
 	 * @return The metadata of the FeatureServer in JSON.
 	 */
-	@RequestMapping("/{serviceName}/FeatureServer")
+	@RequestMapping("/services/{serviceName}/FeatureServer")
 	public Map<String, Object> getFeatureServerMetadata(
 			@PathVariable String serviceName,
-			@RequestParam(value="f", defaultValue="html") String formatType) {
+			@RequestParam(value="f", defaultValue="json") String formatType) {
 		
 		if(!"json".equalsIgnoreCase(formatType)) {
 			log.warn(FORMAT_ERROR_MESSAGE);
@@ -62,11 +90,11 @@ public class Controller {
 	 * @param formatType - The return type for the metadata. Only json is available.
 	 * @return The metadata of the FeatureLayer in JSON.
 	 */
-	@RequestMapping("/{serviceName}/FeatureServer/{layerId}")
+	@RequestMapping("/services/{serviceName}/FeatureServer/{layerId}")
 	public Map<String, Object> getFeatureLayerMetadata(
 			@PathVariable String serviceName,
 			@PathVariable int layerId,
-			@RequestParam(value="f", defaultValue="html") String formatType) {
+			@RequestParam(value="f", defaultValue="json") String formatType) {
 		
 		if(!"json".equalsIgnoreCase(formatType)) {
 			log.warn(FORMAT_ERROR_MESSAGE);
@@ -127,47 +155,50 @@ public class Controller {
 	 * 		If the tolerance is not specified, the maxAllowableOffset is used.
 	 * @return The metadata for the specified query in JSON
 	 */
-	@RequestMapping("/{serviceName}/FeatureServer/{layerId}/query")
+	@RequestMapping("/services/{serviceName}/FeatureServer/{layerId}/query")
 	public Map<String, Object> getQueryResult(
 			@PathVariable String serviceName,
 			@PathVariable int layerId,
-			@RequestParam(value="f", defaultValue="html") String formatType,
+			@RequestParam(value="f", defaultValue="json") String formatType,
 			@RequestParam(value="where", defaultValue="") String where,
 			@RequestParam(value="returnGeometry", defaultValue="true") boolean returnGeometry,
 			@RequestParam(value="spatialRel", defaultValue="esriSpatialRelIntersects") String spatialRel,
-			@RequestParam(value="outFields", defaultValue="") String outFields,
+			@RequestParam(value="outFields", defaultValue="*") String outFields,
 			@RequestParam(value="outSR", defaultValue="0") long outSR,
 			@RequestParam(value="resultOffset", defaultValue="0") int resultOffset,
 			@RequestParam(value="resultRecordCount", defaultValue="0") int resultRecordCount,
 			@RequestParam(value="quantizationParameters", defaultValue="") String quantizationParameters) {
 		
+		// Check for required fields to be present
 		if(!"json".equalsIgnoreCase(formatType)) {
 			log.warn(FORMAT_ERROR_MESSAGE);
 			return ErrorMessageHandler.getErrorMessage(FORMAT_ERROR_MESSAGE);
 		}
-		if("".equals(outFields)) {
-			log.warn(OUTFIELDS_ERROR_MESSAGE);
-			return ErrorMessageHandler.getErrorMessage(OUTFIELDS_ERROR_MESSAGE);
+		
+		return builder.getJsonQueryResult(layerId);
+		
+		// Check if a geometry should be returned. Else exclude the column from the result
+		/*if(!returnGeometry) {
+			log.debug("Creating prepared statement from attributes without geometry...");
+			// Get the data into a temp table
+			String query = builder.createTempTableQuery(outFields);
+			handler.executePreparedStatement(query);
+			
+			// Drop the geometry column
+			handler.executePreparedStatement("ALTER TABLE tempTable DROP COLUMN geometry");
+			
+			// Get the results and drop the temp table
+			query = builder.createPreparedStatement("*", where, resultOffset, resultRecordCount);
+			Map<String, Object> result = handler.getQueryResult(query);
+			handler.executePreparedStatement("DROP TABLE tempTable");
+			
+			return result;
 		}
 		
-		/*
-		// Map all attributes to create a query to the database
-		log.debug("Mapping all attributes from URL...");
-		Map<String, Object> params = new HashMap<>();
-		params.put("where", where);
-		params.put("returnGeometry", returnGeometry);
-		params.put("spatialRel", spatialRel);
-		params.put("outFields", outFields);
-		params.put("outSR", outSR);
-		params.put("resultOffset", resultOffset);
-		params.put("resultRecordCount", resultRecordCount);
-		params.put("quantizationParameters", quantizationParameters);
-		*/
-		
 		log.debug("Creating prepared statement from attributes...");
-		String query = builder.createPreparedStatement(outFields, where);
+		String query = builder.createPreparedStatement(layerId, outFields, where, resultOffset, resultRecordCount);
 		
 		log.debug("Got a valid query. Querying to database...");
-		return handler.executePreparedStatementQuery(query);
+		return handler.getQueryResult(query);*/
 	}
 }

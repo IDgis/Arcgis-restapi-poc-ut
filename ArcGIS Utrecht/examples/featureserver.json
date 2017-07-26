@@ -1,69 +1,79 @@
 {
-  "currentVersion" : 10.51, 
-  "serviceItemId" : "c2883f3c59b54b18990b42739aebeeaa", 
-  "serviceDescription" : "Boerderijen van het Jaar", 
-  "hasVersionedData" : false, 
-  "supportsDisconnectedEditing" : false, 
-  "hasStaticData" : false, 
-  "maxRecordCount" : 1000, 
-  "supportedQueryFormats" : "JSON", 
-  "capabilities" : "Create,Delete,Query,Update,Editing", 
-  "description" : "Boerderijen van het Jaar", 
-  "copyrightText" : "", 
-  "spatialReference" : {
-    "wkid" : 28992, 
-    "latestWkid" : 28992
-  }, 
-  "initialExtent" : {
-    "xmin" : 105162.5115677612, 
-    "ymin" : 448306.18202604906, 
-    "xmax" : 172755.91758214502, 
-    "ymax" : 477296.581896778, 
-    "spatialReference" : {
-      "wkid" : 28992, 
-      "latestWkid" : 28992
-    }
-  }, 
-  "fullExtent" : {
-    "xmin" : 119172.22630000114, 
-    "ymin" : 439472.1316, 
-    "xmax" : 161340.08069999889, 
-    "ymax" : 469550.15799999982, 
-    "spatialReference" : {
-      "wkid" : 28992, 
-      "latestWkid" : 28992
-    }
-  }, 
-  "allowGeometryUpdates" : true, 
-  "units" : "esriMeters", 
-  "size" : 81920, 
-  "syncEnabled" : false, 
-  "supportsApplyEditsWithGlobalIds" : false, 
-  "editorTrackingInfo" : {
-    "enableEditorTracking" : false, 
-    "enableOwnershipAccessControl" : false, 
-    "allowOthersToQuery" : true, 
-    "allowOthersToUpdate" : true, 
-    "allowOthersToDelete" : false, 
-    "allowAnonymousToUpdate" : true, 
-    "allowAnonymousToDelete" : true
-  }, 
-  "xssPreventionInfo" : {
-    "xssPreventionEnabled" : true, 
-    "xssPreventionRule" : "InputOnly", 
-    "xssInputRule" : "rejectInvalid"
-  }, 
-  "layers" : [
-    {
-      "id" : 0, 
-      "name" : "BvJ_point", 
-      "parentLayerId" : -1, 
-      "defaultVisibility" : true, 
-      "subLayerIds" : null, 
-      "minScale" : 0, 
-      "maxScale" : 0, 
-      "geometryType" : "esriGeometryPoint"
-    }
-  ], 
-  "tables" : []
+	"currentVersion": 10.51,
+	"serviceItemId": "edf6d445a5524f7a8739241986ee3bfc",
+	"serviceDescription": "Kaartlagen voor bodem data Utrecht.",
+	"hasVersionedData": false,
+	"supportsDisconnectedEditing": false,
+	"hasStaticData": false,
+	"maxRecordCount": 1000,
+	"supportedQueryFormats": "JSON",
+	"capabilities": "Query",
+	"description": "",
+	"copyrightText": "",
+	"spatialReference": {
+		"wkid": 28992,
+		"latestWkid": 28992
+	},
+	"initialExtent": {
+		"xmin": 114240.045400001,
+		"ymin": 438336.0669,
+		"xmax": 171417.3882,
+		"ymax": 476935.7403,
+		"spatialReference": {
+			"wkid": 28992,
+			"latestWkid": 28992
+		}
+	},
+	"fullExtent": {
+		"xmin": 114240.045400001,
+		"ymin": 438336.0669,
+		"xmax": 171417.3882,
+		"ymax": 476935.7403,
+		"spatialReference": {
+			"wkid": 28992,
+			"latestWkid": 28992
+		}
+	},
+	"allowGeometryUpdates": false,
+	"units": "esriMeters",
+	"size": 1032192,
+	"syncEnabled": false,
+	"supportsApplyEditsWithGlobalIds": false,
+	"editorTrackingInfo": {
+		"enableEditorTracking": false,
+		"enableOwnershipAccessControl": false,
+		"allowOthersToQuery": false,
+		"allowOthersToUpdate": false,
+		"allowOthersToDelete": false,
+		"allowAnonymousToUpdate": false,
+		"allowAnonymousToDelete": false
+	},
+	"xssPreventionInfo": {
+		"xssPreventionEnabled": true,
+		"xssPreventionRule": "InputOnly",
+		"xssInputRule": "rejectInvalid"
+	},
+	"layers": [
+		{
+			"id": 0,
+			"name": "Aardkundige Waarden",
+			"parentLayerId": -1,
+			"defaultVisibility": true,
+			"subLayerIds": null,
+			"minScale": 0,
+			"maxScale": 0,
+			"geometryType": "esriGeometryPolygon"
+		},
+		{
+			"id": 1,
+			"name": "Bodemkaart Veengebied",
+			"parentLayerId": -1,
+			"defaultVisibility": true,
+			"subLayerIds": null,
+			"minScale": 0,
+			"maxScale": 0,
+			"geometryType": "esriGeometryPolygon"
+		}
+	],
+	"tables": []
 }

@@ -1,21 +1,19 @@
 package nl.idgis.query;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.json.JsonParser;
-import org.springframework.boot.json.JsonParserFactory;
 import org.springframework.stereotype.Component;
 
 import com.esri.terraformer.core.Terraformer;
 import com.esri.terraformer.core.TerraformerException;
 import com.esri.terraformer.formats.EsriJson;
 import com.esri.terraformer.formats.GeoJson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import nl.idgis.QueryHandler;
 
@@ -35,19 +33,20 @@ public class QueryBuilder {
 	 * @param layerId - The layer number
 	 * @return
 	 */
-	public Map<String, Object> getJsonQueryResult(int layerId) {
+	public String getJsonQueryResult(int layerId) {
 		log.debug("Creating JSON Object...");
 		String dbUrl = getDbUrl(layerId);
-		Map<String, Object> map = new LinkedHashMap<>();
 		
-		map.put("objectIdFieldName", "OBJECTID");
-		map.put("globalIdFieldName", "");
-		map.put("geometryType", "esriGeometryPolygon");
-		map.put("spatialReference", getSpatialReference());
-		map.put("fields", getFields());
-		map.put("features", getFeatures(dbUrl));
+		JsonObject obj = new JsonObject();
 		
-		return map;
+		obj.addProperty("objectIdFieldName", "OBJECTID");
+		obj.addProperty("globalIdFieldName", "");
+		obj.addProperty("geometryType", "esriGeometryPolygon");
+		obj.add("spatialReference", getSpatialReference());
+		obj.add("fields", getFields());
+		obj.add("features", getFeatures(dbUrl));
+		
+		return obj.toString();
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////
@@ -63,75 +62,77 @@ public class QueryBuilder {
 		}
 	}
 	
-	private Map<String, Object> getSpatialReference() {
+	private JsonObject getSpatialReference() {
 		log.debug("Getting spatialReference...");
-		Map<String, Object> map = new LinkedHashMap<>();
+		JsonObject obj = new JsonObject();
 		
-		map.put("wkid", 28992);
-		map.put("latestWkid", 28992);
+		obj.addProperty("wkid", 28992);
+		obj.addProperty("latestWkid", 28992);
 		
-		return map;
+		return obj;
 	}
 	
-	private List<Object> getFields() {
+	private JsonArray getFields() {
 		log.debug("Getting fields...");
-		List<Object> list = new ArrayList<>();
+		JsonArray arr = new JsonArray();
 		
-		list.add(getField());
+		arr.add(getField());
 		
-		return list;
+		return arr;
 	}
 	
-	private Map<String, Object> getField() {
+	private JsonObject getField() {
 		log.debug("Getting field...");
-		Map<String, Object> map = new LinkedHashMap<>();
+		JsonObject obj = new JsonObject();
 		
-		map.put("name", "OBJECTID");
-		map.put("type", "esriFieldTypeOID");
-		map.put("alias", "OBJECTID");
-		map.put("sqlType", "sqlTypeOther");
-		map.put("domain", null);
-		map.put("defaultValue", null);
+		obj.addProperty("name", "OBJECTID");
+		obj.addProperty("type", "esriFieldTypeOID");
+		obj.addProperty("alias", "OBJECTID");
+		obj.addProperty("sqlType", "sqlTypeOther");
+		obj.add("domain", null);
+		obj.add("defaultValue", null);
 		
-		return map;
+		return obj;
 	}
 	
-	// SELECT SELECT ST_AsGeoJson("SHAPE") FROM {URL}
-	private List<Object> getFeatures(String dbUrl) {
+	private JsonArray getFeatures(String dbUrl) {
 		log.debug("Getting features...");
-		//int numObjects = handler.getNumDbRows(dbUrl);
-		int numObjects = 15; //TODO remove hardcoded number
-		List<Object> list = new ArrayList<>();
+		JsonArray arr = new JsonArray();
+		
+		List<String> geoJsons = handler.getGeoJsonsFromTable(dbUrl);
+		int numObjects = geoJsons.size();
 		
 		if(numObjects > 0) {
-			for(int i = 1; i <= numObjects; i++) {
-				list.add(getFeature(dbUrl, i));
+			for(int i = 0; i < numObjects; i++) {
+				arr.add(getFeature(geoJsons, i));
 			}
 		}
 		
-		return list;
+		return arr;
 	}
 	
-	private Map<String, Object> getFeature(String dbUrl, int index) {
-		Map<String, Object> map = new LinkedHashMap<>();
+	private JsonObject getFeature(List<String> geoJsons, int index) {
+		JsonObject obj = new JsonObject();
 		
-		map.put("attributes", getAttributes(index));
+		obj.add("attributes", getAttributes(index));
 		
-		JsonParser parser = JsonParserFactory.getJsonParser();
-		map.put("geometry", parser.parseMap(getGeoJson(dbUrl, index)));
+		String esriJson = getEsriJson(geoJsons.get(index));
+		JsonParser parser = new JsonParser();
 		
-		return map;
+		obj.add("geometry", parser.parse(esriJson));
+		
+		return obj;
 	}
 	
-	private Map<String, Object> getAttributes(int index) {
-		Map<String, Object> map = new LinkedHashMap<>();
+	private JsonObject getAttributes(int index) {
+		JsonObject obj = new JsonObject();
 		
-		map.put("OBJECTID", index);
+		obj.addProperty("OBJECTID", index + 1);
 		
-		return map;
+		return obj;
 	}
 	
-	private String getGeoJson(String dbUrl, int index) {
+	private String getEsriJson(String geoJson) {
 		Terraformer t = new Terraformer();
 		
 		t.setDecoder(new GeoJson());
@@ -139,15 +140,13 @@ public class QueryBuilder {
 		ej.setSpatialReference(28992);
 		t.setEncoder(ej);
 		
-		String geoJson = handler.getGeoJsonGeometry(dbUrl, index);
-		String esriJson;
+		String esriJson = "";
 		try {
 			esriJson = t.convert(geoJson);
-			return esriJson;
-		} catch (TerraformerException e) {
+		} catch(TerraformerException e) {
 			log.error(e.getMessage(), e);
 		}
 		
-		return "";
+		return esriJson;
 	}
 }

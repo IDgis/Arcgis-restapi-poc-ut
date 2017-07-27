@@ -1,8 +1,5 @@
 package nl.idgis.controller;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.gson.JsonObject;
+
 import nl.idgis.ErrorMessageHandler;
 import nl.idgis.MetaDataHandler;
-import nl.idgis.QueryHandler;
 import nl.idgis.featurelayer.FeatureLayerHandler;
 import nl.idgis.featureserver.FeatureServerHandler;
 import nl.idgis.query.QueryBuilder;
@@ -29,9 +27,6 @@ public class Controller {
 	@Autowired
 	private QueryBuilder builder;
 	
-	@Autowired
-	private QueryHandler handler;
-	
 	/**
 	 * The ServerInfo resource provides general information about the server (e.g. current version of the server), 
 	 * and provides information on whether the server is secured using token based authentication; and the token 
@@ -41,7 +36,7 @@ public class Controller {
 	 * @return
 	 */
 	@RequestMapping("/info")
-	public Map<String, Object> getServerInfo(
+	public String getServerInfo(
 			@RequestParam(value="f", defaultValue="json") String formatType) {
 		
 		if(!"json".equalsIgnoreCase(formatType)) {
@@ -49,15 +44,15 @@ public class Controller {
 			return ErrorMessageHandler.getErrorMessage(FORMAT_ERROR_MESSAGE);
 		}
 		
-		Map<String, Object> returnMap = new LinkedHashMap<>();
-		returnMap.put("currentVersion", 10.51);
-		returnMap.put("owningSystemUrl", "http://localhost:8090");
+		JsonObject obj = new JsonObject();
+		obj.addProperty("currentVersion", 10.51);
+		obj.addProperty("owningSystemUrl", "http://localhost:8090");
 		
-		Map<String, Object> authInfo = new LinkedHashMap<>();
-		authInfo.put("isTokenBasedSecurity", false);
-		returnMap.put("authInfo", authInfo);
+		JsonObject authInfo = new JsonObject();
+		obj.addProperty("isTokenBasedSecurity", false);
+		obj.add("authInfo", authInfo);
 		
-		return returnMap;
+		return obj.toString();
 	}
 
 	/**
@@ -68,14 +63,14 @@ public class Controller {
 	 * @return The metadata of the FeatureServer in JSON.
 	 */
 	@RequestMapping("/services/{serviceName}/FeatureServer")
-	public Map<String, Object> getFeatureServerMetadata(
+	public String getFeatureServerMetadata(
 			@PathVariable String serviceName,
 			@RequestParam(value="f", defaultValue="json") String formatType) {
 		
-		if(!"json".equalsIgnoreCase(formatType)) {
+		/*if(!"json".equalsIgnoreCase(formatType)) {
 			log.warn(FORMAT_ERROR_MESSAGE);
 			return ErrorMessageHandler.getErrorMessage(FORMAT_ERROR_MESSAGE);
-		}
+		}*/
 		
 		MetaDataHandler metaDataHandler = new FeatureServerHandler();
 		log.debug(String.format("Getting metadata for serviceName: %s", serviceName));
@@ -91,26 +86,22 @@ public class Controller {
 	 * @return The metadata of the FeatureLayer in JSON.
 	 */
 	@RequestMapping("/services/{serviceName}/FeatureServer/{layerId}")
-	public Map<String, Object> getFeatureLayerMetadata(
+	public String getFeatureLayerMetadata(
 			@PathVariable String serviceName,
 			@PathVariable int layerId,
 			@RequestParam(value="f", defaultValue="json") String formatType) {
 		
-		if(!"json".equalsIgnoreCase(formatType)) {
+		/*if(!"json".equalsIgnoreCase(formatType)) {
 			log.warn(FORMAT_ERROR_MESSAGE);
 			return ErrorMessageHandler.getErrorMessage(FORMAT_ERROR_MESSAGE);
-		}
+		}*/
 		
 		String jsonUrl = null;
-		switch(layerId) {
-		case 0:
+		if(layerId == 0) {
 			jsonUrl = "./examples/featureLayer0.json";
-			break;
-		case 1:
+		}
+		else {
 			jsonUrl = "./examples/featureLayer1.json";
-			break;
-		default:
-			return ErrorMessageHandler.getErrorMessage("Invalid layer id. Please enter 0 or 1");
 		}
 		
 		MetaDataHandler metaDataHandler = new FeatureLayerHandler();
@@ -156,7 +147,7 @@ public class Controller {
 	 * @return The metadata for the specified query in JSON
 	 */
 	@RequestMapping("/services/{serviceName}/FeatureServer/{layerId}/query")
-	public Map<String, Object> getQueryResult(
+	public String getQueryResult(
 			@PathVariable String serviceName,
 			@PathVariable int layerId,
 			@RequestParam(value="f", defaultValue="json") String formatType,

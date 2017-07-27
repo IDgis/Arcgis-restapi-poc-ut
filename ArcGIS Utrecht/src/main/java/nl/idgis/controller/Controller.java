@@ -3,6 +3,7 @@ package nl.idgis.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -173,8 +174,12 @@ public class Controller {
 		}
 		
 		String retVal = builder.getJsonQueryResult(layerId);
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.setCacheControl("private, max-age=0, s-maxage=0");
+		
 		log.debug("Got the data, returning the result...");
-		return new ResponseEntity<>(retVal, HttpStatus.OK);
+		return new ResponseEntity<>(retVal, headers, HttpStatus.OK);
 		
 		// Check if a geometry should be returned. Else exclude the column from the result
 		/*if(!returnGeometry) {

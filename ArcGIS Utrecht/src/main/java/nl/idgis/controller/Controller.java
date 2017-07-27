@@ -3,6 +3,8 @@ package nl.idgis.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,12 +38,12 @@ public class Controller {
 	 * @return
 	 */
 	@RequestMapping("/info")
-	public String getServerInfo(
+	public ResponseEntity<String> getServerInfo(
 			@RequestParam(value="f", defaultValue="json") String formatType) {
 		
 		if(!"json".equalsIgnoreCase(formatType)) {
 			log.warn(FORMAT_ERROR_MESSAGE);
-			return ErrorMessageHandler.getErrorMessage(FORMAT_ERROR_MESSAGE);
+			return new ResponseEntity<>(ErrorMessageHandler.getErrorMessage(FORMAT_ERROR_MESSAGE), HttpStatus.BAD_REQUEST);
 		}
 		
 		JsonObject obj = new JsonObject();
@@ -52,7 +54,7 @@ public class Controller {
 		obj.addProperty("isTokenBasedSecurity", false);
 		obj.add("authInfo", authInfo);
 		
-		return obj.toString();
+		return new ResponseEntity<>(obj.toString(), HttpStatus.OK);
 	}
 
 	/**
@@ -63,7 +65,7 @@ public class Controller {
 	 * @return The metadata of the FeatureServer in JSON.
 	 */
 	@RequestMapping("/services/{serviceName}/FeatureServer")
-	public String getFeatureServerMetadata(
+	public ResponseEntity<String> getFeatureServerMetadata(
 			@PathVariable String serviceName,
 			@RequestParam(value="f", defaultValue="json") String formatType) {
 		
@@ -74,7 +76,7 @@ public class Controller {
 		
 		MetaDataHandler metaDataHandler = new FeatureServerHandler();
 		log.debug(String.format("Getting metadata for serviceName: %s", serviceName));
-		return metaDataHandler.getMetadata("./examples/featureserver.json");
+		return new ResponseEntity<>(metaDataHandler.getMetadata("./examples/featureserver.json"), HttpStatus.OK);
 	}
 	
 	/**
@@ -86,10 +88,12 @@ public class Controller {
 	 * @return The metadata of the FeatureLayer in JSON.
 	 */
 	@RequestMapping("/services/{serviceName}/FeatureServer/{layerId}")
-	public String getFeatureLayerMetadata(
+	public ResponseEntity<String> getFeatureLayerMetadata(
 			@PathVariable String serviceName,
 			@PathVariable int layerId,
 			@RequestParam(value="f", defaultValue="json") String formatType) {
+		
+		log.info("Got a request to get metadata for FeatureLayer...");
 		
 		/*if(!"json".equalsIgnoreCase(formatType)) {
 			log.warn(FORMAT_ERROR_MESSAGE);
@@ -106,7 +110,7 @@ public class Controller {
 		
 		MetaDataHandler metaDataHandler = new FeatureLayerHandler();
 		log.debug(String.format("Getting metadata for serviceName: %s and layerId: %d", serviceName, layerId));
-		return metaDataHandler.getMetadata(jsonUrl);
+		return new ResponseEntity<>(metaDataHandler.getMetadata(jsonUrl), HttpStatus.OK);
 	}
 	
 	/**
@@ -147,7 +151,7 @@ public class Controller {
 	 * @return The metadata for the specified query in JSON
 	 */
 	@RequestMapping("/services/{serviceName}/FeatureServer/{layerId}/query")
-	public String getQueryResult(
+	public ResponseEntity<String> getQueryResult(
 			@PathVariable String serviceName,
 			@PathVariable int layerId,
 			@RequestParam(value="f", defaultValue="json") String formatType,
@@ -160,13 +164,17 @@ public class Controller {
 			@RequestParam(value="resultRecordCount", defaultValue="0") int resultRecordCount,
 			@RequestParam(value="quantizationParameters", defaultValue="") String quantizationParameters) {
 		
+		log.debug(String.format("Got a query request for layer %d, getting data...", layerId));
+		
 		// Check for required fields to be present
 		if(!"json".equalsIgnoreCase(formatType)) {
 			log.warn(FORMAT_ERROR_MESSAGE);
-			return ErrorMessageHandler.getErrorMessage(FORMAT_ERROR_MESSAGE);
+			return new ResponseEntity<>(ErrorMessageHandler.getErrorMessage(FORMAT_ERROR_MESSAGE), HttpStatus.BAD_REQUEST);
 		}
 		
-		return builder.getJsonQueryResult(layerId);
+		String retVal = builder.getJsonQueryResult(layerId);
+		log.debug("Got the data, returning the result...");
+		return new ResponseEntity<>(retVal, HttpStatus.OK);
 		
 		// Check if a geometry should be returned. Else exclude the column from the result
 		/*if(!returnGeometry) {

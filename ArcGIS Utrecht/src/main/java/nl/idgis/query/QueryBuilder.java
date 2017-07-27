@@ -34,7 +34,7 @@ public class QueryBuilder {
 	 * @return
 	 */
 	public String getJsonQueryResult(int layerId) {
-		log.debug("Creating JSON Object...");
+		log.debug("Generating JSON Object...");
 		String dbUrl = getDbUrl(layerId);
 		
 		JsonObject obj = new JsonObject();
@@ -101,6 +101,7 @@ public class QueryBuilder {
 		
 		List<String> geoJsons = handler.getGeoJsonsFromTable(dbUrl);
 		int numObjects = geoJsons.size();
+		log.debug(String.format("%d results found...", numObjects));
 		
 		if(numObjects > 0) {
 			for(int i = 0; i < numObjects; i++) {
@@ -108,6 +109,7 @@ public class QueryBuilder {
 			}
 		}
 		
+		log.debug("All features found, returning the array...");
 		return arr;
 	}
 	

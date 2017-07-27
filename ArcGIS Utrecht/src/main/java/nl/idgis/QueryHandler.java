@@ -28,7 +28,7 @@ public class QueryHandler {
 	 * @return The geometry in GeoJson
 	 */
 	public List<String> getGeoJsonsFromTable(String dbUrl) {
-		log.debug("Getting GeoJsons from database...");
+		log.debug("Connecting to the database...");
 		String query = String.format("SELECT ST_AsGeoJson(\"SHAPE\") AS geo FROM %s", dbUrl);
 		
 		try(Connection conn = jdbcTemplate.getDataSource().getConnection();
@@ -49,7 +49,7 @@ public class QueryHandler {
 			while(rs.next()) {
 				list.add(rs.getString("geo"));
 			}
-			log.debug("Got the GeoJsons, returning the list...");
+			log.debug("Got the data from the database...");
 			return list;
 			
 		} catch (SQLException e) {

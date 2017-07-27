@@ -25,10 +25,10 @@
 		}
 	},
 	"fullExtent": {
-		"xmin": 114240.045400001,
-		"ymin": 438336.0669,
-		"xmax": 171417.3882,
-		"ymax": 476935.7403,
+		"xmin": 118240.045400001,
+		"ymin": 435336.0669,
+		"xmax": 170917.3882,
+		"ymax": 476535.7403,
 		"spatialReference": {
 			"wkid": 28992,
 			"latestWkid": 28992
@@ -42,7 +42,7 @@
 	"editorTrackingInfo": {
 		"enableEditorTracking": false,
 		"enableOwnershipAccessControl": false,
-		"allowOthersToQuery": false,
+		"allowOthersToQuery": true,
 		"allowOthersToUpdate": false,
 		"allowOthersToDelete": false,
 		"allowAnonymousToUpdate": false,

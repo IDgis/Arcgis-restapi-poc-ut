@@ -157,7 +157,7 @@ public class Controller {
 			return new ResponseEntity<>(ErrorMessageHandler.getErrorMessage(FORMAT_ERROR_MESSAGE), HttpStatus.BAD_REQUEST);
 		}
 		
-		String retVal = builder.getJsonQueryResult(layerId, returnGeometry, geometry, outSR, resultOffset, resultRecordCount);
+		String retVal = builder.getJsonQueryResult(layerId, where, returnGeometry, geometry, outSR, resultOffset, resultRecordCount);
 		
 		HttpHeaders headers = new HttpHeaders();
 		//headers.setCacheControl("public, max-age=86400");

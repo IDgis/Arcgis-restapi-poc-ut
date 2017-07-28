@@ -33,13 +33,13 @@ public class QueryHandler {
 	 * @param resultRecordCount - The LIMIT
 	 * @return The geometry in GeoJson
 	 */
-	public Map<String, Object> getDataFromTable(String dbUrl, double[] extent, int outSR, int resultOffset, int resultRecordCount) {
+	public Map<String, Object> getDataFromTable(String dbUrl, String where, double[] extent, int outSR, int resultOffset, int resultRecordCount) {
 		log.debug("Connecting to the database...");
 		Map<String, Object> data = new HashMap<>();
 		List<String> geoJsons = null;
 		
 		String query = String.format("SELECT ST_AsGeoJson(\"SHAPE\") AS geo FROM %s%s LIMIT %d OFFSET %d", 
-				dbUrl, getWhereExtent(extent, outSR), resultRecordCount, resultOffset);
+				dbUrl, getWhereExtent(where, extent, outSR), resultRecordCount, resultOffset);
 		
 		try(Connection conn = jdbcTemplate.getDataSource().getConnection();
 			PreparedStatement statement = conn.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE,
@@ -69,12 +69,18 @@ public class QueryHandler {
 		return data;
 	}
 	
-	private String getWhereExtent(double[] extent, int outSR) {
+	private String getWhereExtent(String where, double[] extent, int outSR) {
 		if(extent.length == 0) {
 			return "";
 		}
-		return "WHERE ST_Overlaps(\"SHAPE\", ST_MakeEnvelope(" + extent[0] + ", " + extent[1] + ", "
+		StringBuilder builder = new StringBuilder();
+		builder.append("WHERE ST_Overlaps(\"SHAPE\", ST_MakeEnvelope(" + extent[0] + ", " + extent[1] + ", "
 															   + extent[2] + ", " + extent[3] + ", " 
-															   + outSR + "))";
+															   + outSR + "))");
+		if(!"".equals(where)) {
+			builder.append(" AND " + where);
+		}
+		
+		return builder.toString();
 	}
 }

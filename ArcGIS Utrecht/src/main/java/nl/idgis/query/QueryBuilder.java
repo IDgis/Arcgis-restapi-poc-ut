@@ -38,11 +38,11 @@ public class QueryBuilder {
 	 */
 	@Cacheable("data")
 	@SuppressWarnings("unchecked")
-	public String getJsonQueryResult(int layerId, boolean returnGeometry, String geometry, int outSR, int resultOffset, int resultRecordCount) {
+	public String getJsonQueryResult(int layerId, String where, boolean returnGeometry, String geometry, int outSR, int resultOffset, int resultRecordCount) {
 		log.debug("Generating data...");
 		String dbUrl = getDbUrl(layerId);
 		double[] extent = getExtentFromGeometry(geometry);
-		Map<String, Object> data = handler.getDataFromTable(dbUrl, extent, outSR, resultOffset, resultRecordCount);
+		Map<String, Object> data = handler.getDataFromTable(dbUrl, where, extent, outSR, resultOffset, resultRecordCount);
 		List<String> geoJsons = (List<String>)data.get("geoJsons");
 		
 		JsonObject obj = new JsonObject();

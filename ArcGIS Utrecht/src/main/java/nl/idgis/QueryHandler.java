@@ -33,13 +33,14 @@ public class QueryHandler {
 	 * @param resultRecordCount - The LIMIT
 	 * @return The geometry in GeoJson
 	 */
-	public Map<String, Object> getDataFromTable(String dbUrl, String where, double[] extent, int outSR, int resultOffset, int resultRecordCount) {
+	public Map<String, Object> getDataFromTable(String dbUrl, String[] fields, String where, double[] extent, int outSR, int resultOffset, int resultRecordCount) {
 		log.debug("Connecting to the database...");
 		Map<String, Object> data = new HashMap<>();
-		List<String> geoJsons = null;
+		List<Object> list = null;
 		
-		String query = String.format("SELECT ST_AsGeoJson(\"SHAPE\") AS geo FROM %s%s LIMIT %d OFFSET %d", 
+		String query = String.format("SELECT ST_AsGeoJson(\"SHAPE\") AS geoJsons, * FROM %s%s LIMIT %d OFFSET %d", 
 				dbUrl, getWhereExtent(where, extent, outSR), resultRecordCount, resultOffset);
+		log.debug("Query: " + query);
 		
 		try(Connection conn = jdbcTemplate.getDataSource().getConnection();
 			PreparedStatement statement = conn.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE,
@@ -55,16 +56,20 @@ public class QueryHandler {
 				rs.beforeFirst();
 			}
 			
-			geoJsons = new ArrayList<>(numRows);
-			while(rs.next()) {
-				geoJsons.add(rs.getString("geo"));
+			for(int i = 0; i < fields.length; i++) {
+				rs.beforeFirst();
+				list = new ArrayList<>(numRows);
+				while(rs.next()) {
+					list.add(rs.getObject(fields[i]));
+				}
+				data.put(fields[i], list);
 			}
+			
 			log.debug("Got the data from the database...");
 			
 		} catch (SQLException e) {
 			log.error(e.getMessage(), e);
 		}
-		data.put("geoJsons", geoJsons);
 		
 		return data;
 	}
@@ -74,7 +79,7 @@ public class QueryHandler {
 			return "";
 		}
 		StringBuilder builder = new StringBuilder();
-		builder.append("WHERE ST_Overlaps(\"SHAPE\", ST_MakeEnvelope(" + extent[0] + ", " + extent[1] + ", "
+		builder.append(" WHERE ST_Intersects(\"SHAPE\", ST_MakeEnvelope(" + extent[0] + ", " + extent[1] + ", "
 															   + extent[2] + ", " + extent[3] + ", " 
 															   + outSR + "))");
 		if(!"".equals(where)) {

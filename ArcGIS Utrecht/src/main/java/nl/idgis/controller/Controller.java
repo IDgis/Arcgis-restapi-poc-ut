@@ -160,7 +160,7 @@ public class Controller {
 		String retVal = builder.getJsonQueryResult(layerId, where, returnGeometry, geometry, outSR, resultOffset, resultRecordCount);
 		
 		HttpHeaders headers = new HttpHeaders();
-		//headers.setCacheControl("public, max-age=86400");
+		headers.setCacheControl("public, max-age=86400");
 		
 		log.debug("Got the data, returning the result...");
 		return new ResponseEntity<>(retVal, headers, HttpStatus.OK);

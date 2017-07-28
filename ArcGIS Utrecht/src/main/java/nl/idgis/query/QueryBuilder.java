@@ -26,6 +26,9 @@ public class QueryBuilder {
 	private static final String AARDKUNDIG = "staging_data.\"222b66f4-b450-4871-8874-52170d56b1e8\"";
 	private static final String VEENGEBIED = "staging_data.\"bddbf261-4401-47e0-a721-d832a44e0462\"";
 	
+	private static final String[] aardkundigFields = {"INSPIREID", "PERCENTAGEUNDERDESIGNATION", "URL1", "URL2", "GEBIEDSOMS", "FUNCTIE", "geoJsons"};
+	private static final String[] veengebiedFields = {"CODE", "OMSCHRIJVI", "geoJsons"};
+	
 	private static final Logger log = LoggerFactory.getLogger(QueryBuilder.class);
 	
 	@Autowired QueryHandler handler;
@@ -41,8 +44,10 @@ public class QueryBuilder {
 	public String getJsonQueryResult(int layerId, String where, boolean returnGeometry, String geometry, int outSR, int resultOffset, int resultRecordCount) {
 		log.debug("Generating data...");
 		String dbUrl = getDbUrl(layerId);
+		String[] fields = getFieldsToGet(layerId);
 		double[] extent = getExtentFromGeometry(geometry);
-		Map<String, Object> data = handler.getDataFromTable(dbUrl, where, extent, outSR, resultOffset, resultRecordCount);
+		Map<String, Object> data = handler.getDataFromTable(dbUrl, fields, where, extent, outSR, resultOffset, resultRecordCount);
+		
 		List<String> geoJsons = (List<String>)data.get("geoJsons");
 		
 		JsonObject obj = new JsonObject();
@@ -51,7 +56,7 @@ public class QueryBuilder {
 		obj.addProperty("globalIdFieldName", "");
 		obj.addProperty("geometryType", "esriGeometryPolygon");
 		obj.add("spatialReference", getSpatialReference());
-		obj.add("fields", getFields());
+		obj.add("fields", getFields(layerId));
 		obj.add("features", getFeatures(geoJsons, returnGeometry));
 		
 		return obj.toString();
@@ -65,6 +70,17 @@ public class QueryBuilder {
 			return AARDKUNDIG;
 		case 1:
 			return VEENGEBIED;
+		default:
+			return null;
+		}
+	}
+	
+	private String[] getFieldsToGet(int layerId) {
+		switch(layerId) {
+		case 0:
+			return aardkundigFields;
+		case 1:
+			return veengebiedFields;
 		default:
 			return null;
 		}
@@ -96,27 +112,113 @@ public class QueryBuilder {
 		return obj;
 	}
 	
-	private JsonArray getFields() {
+	private JsonArray getFields(int layerId) {
 		log.debug("Getting fields...");
+		
+		if(layerId == 0) {
+			return getAardkundigeFields();
+		}
+		else {
+			return getVeengebiedFields();
+		}
+	}
+	
+	private JsonArray getAardkundigeFields() {
 		JsonArray arr = new JsonArray();
 		
-		arr.add(getField());
+		JsonObject objectId = new JsonObject();
+		objectId.addProperty("name", "OBJECTID");
+		objectId.addProperty("type", "esriFieldTypeOID");
+		objectId.addProperty("alias", "OBJECTID");
+		objectId.addProperty("sqlType", "sqlTypeOther");
+		objectId.add("domain", null);
+		objectId.add("defaultValue", null);
 		
+		JsonObject inspireId = new JsonObject();
+		inspireId.addProperty("name", "INSPIREID");
+		inspireId.addProperty("type", "esriFieldTypeString");
+		inspireId.addProperty("alias", "INSPIREID");
+		inspireId.addProperty("sqlType", "sqlTypeOther");
+		inspireId.addProperty("length", 200);
+		inspireId.add("domain", null);
+		inspireId.add("defaultValue", null);
+		
+		JsonObject percentage = new JsonObject();
+		percentage.addProperty("name", "PERCENTAGEUNDERDESIGNATION");
+		percentage.addProperty("type", "esriFieldTypeInteger");
+		percentage.addProperty("alias", "PERCENTAGEUNDERDESIGNATION");
+		percentage.addProperty("sqlType", "sqlTypeOther");
+		percentage.add("domain", null);
+		percentage.add("defaultValue", null);
+		
+		JsonObject url1 = new JsonObject();
+		url1.addProperty("name", "URL1");
+		url1.addProperty("type", "esriFieldTypeString");
+		url1.addProperty("alias", "URL1");
+		url1.addProperty("sqlType", "sqlTypeOther");
+		url1.addProperty("length", 200);
+		url1.add("domain", null);
+		url1.add("defaultValue", null);
+		
+		JsonObject url2 = new JsonObject();
+		url2.addProperty("name", "URL2");
+		url2.addProperty("type", "esriFieldTypeString");
+		url2.addProperty("alias", "URL2");
+		url2.addProperty("sqlType", "sqlTypeOther");
+		url2.addProperty("length", 200);
+		url2.add("domain", null);
+		url2.add("defaultValue", null);
+		
+		JsonObject omschrijving = new JsonObject();
+		omschrijving.addProperty("name", "GEBIEDSOMS");
+		omschrijving.addProperty("type", "esriFieldTypeString");
+		omschrijving.addProperty("alias", "GEBIEDSOMS");
+		omschrijving.addProperty("sqlType", "sqlTypeOther");
+		omschrijving.addProperty("length", 800);
+		omschrijving.add("domain", null);
+		omschrijving.add("defaultValue", null);
+		
+		JsonObject functie = new JsonObject();
+		functie.addProperty("name", "FUNCTIE");
+		functie.addProperty("type", "esriFieldTypeString");
+		functie.addProperty("alias", "FUNCTIE");
+		functie.addProperty("sqlType", "sqlTypeOther");
+		functie.addProperty("length", 100);
+		functie.add("domain", null);
+		functie.add("defaultValue", null);
+		
+		arr.add(objectId);
+		arr.add(inspireId);
+		arr.add(percentage);
+		arr.add(url1);
+		arr.add(url2);
+		arr.add(omschrijving);
+		arr.add(functie);
 		return arr;
 	}
 	
-	private JsonObject getField() {
-		log.debug("Getting field...");
-		JsonObject obj = new JsonObject();
+	private JsonArray getVeengebiedFields() {
+		JsonArray arr = new JsonArray();
 		
-		obj.addProperty("name", "OBJECTID");
-		obj.addProperty("type", "esriFieldTypeOID");
-		obj.addProperty("alias", "OBJECTID");
-		obj.addProperty("sqlType", "sqlTypeOther");
-		obj.add("domain", null);
-		obj.add("defaultValue", null);
+		JsonObject code = new JsonObject();
+		code.addProperty("name", "CODE");
+		code.addProperty("type", "esriFieldTypeString");
+		code.addProperty("alias", "CODE");
+		code.addProperty("sqlType", "sqlTypeOther");
+		code.addProperty("length", 80);
+		code.add("domain", null);
+		code.add("defaultValue", null);
 		
-		return obj;
+		JsonObject omschrijving = new JsonObject();
+		omschrijving.addProperty("name", "OMSCHRIJVI");
+		omschrijving.addProperty("type", "esriFieldTypeString");
+		omschrijving.addProperty("alias", "OMSCHRIJVI");
+		omschrijving.addProperty("sqlType", "sqlTypeOther");
+		omschrijving.addProperty("length", 200);
+		omschrijving.add("domain", null);
+		omschrijving.add("defaultValue", null);
+		
+		return arr;
 	}
 	
 	private JsonArray getFeatures(List<String> geoJsons, boolean returnGeometry) {

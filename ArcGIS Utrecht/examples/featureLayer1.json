@@ -114,7 +114,7 @@
 		{
 			"name": "OMSCHRIJVI",
 			"type": "esriFieldTypeString",
-			"alias": "Omschrijving",
+			"alias": "OMSCHRIJVI",
 			"sqlType": "sqlTypeOther",
 			"length": 200,
 			"nullable": true,

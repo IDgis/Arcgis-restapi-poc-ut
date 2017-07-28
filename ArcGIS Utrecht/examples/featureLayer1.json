@@ -28,7 +28,7 @@
 		"supportsQueryRelatedPagination": true,
 		"supportsQueryWithDistance": true,
 		"supportsReturningQueryExtent": true,
-		"supportsStatistics": true,
+		"supportsStatistics": false,
 		"supportsOrderBy": true,
 		"supportsDistinct": true,
 		"supportsQueryWithResultType": true,

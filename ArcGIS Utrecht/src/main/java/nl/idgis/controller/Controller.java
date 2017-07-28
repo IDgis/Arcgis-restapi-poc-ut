@@ -70,10 +70,10 @@ public class Controller {
 			@PathVariable String serviceName,
 			@RequestParam(value="f", defaultValue="json") String formatType) {
 		
-		/*if(!"json".equalsIgnoreCase(formatType)) {
+		if(!"json".equalsIgnoreCase(formatType)) {
 			log.warn(FORMAT_ERROR_MESSAGE);
-			return ErrorMessageHandler.getErrorMessage(FORMAT_ERROR_MESSAGE);
-		}*/
+			return new ResponseEntity<>(ErrorMessageHandler.getErrorMessage(FORMAT_ERROR_MESSAGE), HttpStatus.BAD_REQUEST);
+		}
 		
 		MetaDataHandler metaDataHandler = new FeatureServerHandler();
 		log.debug(String.format("Getting metadata for serviceName: %s", serviceName));
@@ -96,10 +96,10 @@ public class Controller {
 		
 		log.info("Got a request to get metadata for FeatureLayer...");
 		
-		/*if(!"json".equalsIgnoreCase(formatType)) {
+		if(!"json".equalsIgnoreCase(formatType)) {
 			log.warn(FORMAT_ERROR_MESSAGE);
-			return ErrorMessageHandler.getErrorMessage(FORMAT_ERROR_MESSAGE);
-		}*/
+			return new ResponseEntity<>(ErrorMessageHandler.getErrorMessage(FORMAT_ERROR_MESSAGE), HttpStatus.BAD_REQUEST);
+		}
 		
 		String jsonUrl = null;
 		if(layerId == 0) {
@@ -176,33 +176,9 @@ public class Controller {
 		String retVal = builder.getJsonQueryResult(layerId);
 		
 		HttpHeaders headers = new HttpHeaders();
-		headers.setCacheControl("private, max-age=0, s-maxage=0");
+		//headers.setCacheControl("public, max-age=86400");
 		
 		log.debug("Got the data, returning the result...");
 		return new ResponseEntity<>(retVal, headers, HttpStatus.OK);
-		
-		// Check if a geometry should be returned. Else exclude the column from the result
-		/*if(!returnGeometry) {
-			log.debug("Creating prepared statement from attributes without geometry...");
-			// Get the data into a temp table
-			String query = builder.createTempTableQuery(outFields);
-			handler.executePreparedStatement(query);
-			
-			// Drop the geometry column
-			handler.executePreparedStatement("ALTER TABLE tempTable DROP COLUMN geometry");
-			
-			// Get the results and drop the temp table
-			query = builder.createPreparedStatement("*", where, resultOffset, resultRecordCount);
-			Map<String, Object> result = handler.getQueryResult(query);
-			handler.executePreparedStatement("DROP TABLE tempTable");
-			
-			return result;
-		}
-		
-		log.debug("Creating prepared statement from attributes...");
-		String query = builder.createPreparedStatement(layerId, outFields, where, resultOffset, resultRecordCount);
-		
-		log.debug("Got a valid query. Querying to database...");
-		return handler.getQueryResult(query);*/
 	}
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import com.esri.terraformer.core.Terraformer;
@@ -95,6 +96,7 @@ public class QueryBuilder {
 		return obj;
 	}
 	
+	@Cacheable("geoJsons")
 	private JsonArray getFeatures(String dbUrl) {
 		log.debug("Getting features...");
 		JsonArray arr = new JsonArray();
@@ -113,6 +115,7 @@ public class QueryBuilder {
 		return arr;
 	}
 	
+	@Cacheable("esriJson")
 	private JsonObject getFeature(List<String> geoJsons, int index) {
 		JsonObject obj = new JsonObject();
 		

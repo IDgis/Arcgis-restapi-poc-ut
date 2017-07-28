@@ -4,7 +4,7 @@
 	"name": "Aardkundige waarden",
 	"type": "Feature Layer",
 	"serviceItemId": "edf6d445a5524f7a8739241986ee3bfc",
-	"displayField": "NAAM",
+	"displayField": "OBJECTID",
 	"description": "",
 	"copyrightText": "",
 	"defaultVisibility": true,
@@ -101,11 +101,65 @@
 			"defaultValue": null
 		},
 		{
-			"name": "NAAM",
+			"name": "INSPIREID",
 			"type": "esriFieldTypeString",
-			"alias": "Naam",
+			"alias": "INSPIREID",
 			"sqlType": "sqlTypeOther",
-			"length": 254,
+			"length": 200,
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "PERCENTAGEUNDERDESIGNATION",
+			"type": "esriFieldTypeInteger",
+			"alias": "PERCENTAGEUNDERDESIGNATION",
+			"sqlType": "sqlTypeOther",
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "URL1",
+			"type": "esriFieldTypeString",
+			"alias": "URL1",
+			"sqlType": "sqlTypeOther",
+			"length": 200,
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "URL2",
+			"type": "esriFieldTypeString",
+			"alias": "URL2",
+			"sqlType": "sqlTypeOther",
+			"length": 200,
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "GEBIEDSOMS",
+			"type": "esriFieldTypeString",
+			"alias": "Gebiedsomschrijving",
+			"sqlType": "sqlTypeOther",
+			"length": 800,
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "FUNCTIE",
+			"type": "esriFieldTypeString",
+			"alias": "FUNCTIE",
+			"sqlType": "sqlTypeOther",
+			"length": 100,
 			"nullable": true,
 			"editable": true,
 			"domain": null,
@@ -136,7 +190,12 @@
 			"drawingTool": "esriFeatureEditToolPoint",
 			"prototype": {
 				"attributes": {
-					"NAAM": null
+					"INSPIREID": null,
+					"PERCENTAGEUNDERDESIGNATION": null,
+					"URL1": null,
+					"URL2": null,
+					"GEBIEDSOMS": null,
+					"FUNCTIE": null
 				}
 			}
 		}

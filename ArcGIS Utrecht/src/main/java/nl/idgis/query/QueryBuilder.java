@@ -1,6 +1,7 @@
 package nl.idgis.query;
 
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import com.esri.terraformer.core.TerraformerException;
 import com.esri.terraformer.formats.EsriJson;
 import com.esri.terraformer.formats.GeoJson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -34,9 +36,14 @@ public class QueryBuilder {
 	 * @param layerId - The layer number
 	 * @return
 	 */
-	public String getJsonQueryResult(int layerId) {
-		log.debug("Generating JSON Object...");
+	@Cacheable("data")
+	@SuppressWarnings("unchecked")
+	public String getJsonQueryResult(int layerId, boolean returnGeometry, String geometry, int outSR, int resultOffset, int resultRecordCount) {
+		log.debug("Generating data...");
 		String dbUrl = getDbUrl(layerId);
+		double[] extent = getExtentFromGeometry(geometry);
+		Map<String, Object> data = handler.getDataFromTable(dbUrl, extent, outSR, resultOffset, resultRecordCount);
+		List<String> geoJsons = (List<String>)data.get("geoJsons");
 		
 		JsonObject obj = new JsonObject();
 		
@@ -45,7 +52,7 @@ public class QueryBuilder {
 		obj.addProperty("geometryType", "esriGeometryPolygon");
 		obj.add("spatialReference", getSpatialReference());
 		obj.add("fields", getFields());
-		obj.add("features", getFeatures(dbUrl));
+		obj.add("features", getFeatures(geoJsons, returnGeometry));
 		
 		return obj.toString();
 	}
@@ -61,6 +68,22 @@ public class QueryBuilder {
 		default:
 			return null;
 		}
+	}
+	
+	private double[] getExtentFromGeometry(String geometry) {
+		if("".equals(geometry)) {
+			return new double[0];
+		}
+		
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(geometry);
+		
+		double xmin = element.getAsJsonObject().get("xmin").getAsDouble();
+		double ymin = element.getAsJsonObject().get("ymin").getAsDouble();
+		double xmax = element.getAsJsonObject().get("xmax").getAsDouble();
+		double ymax = element.getAsJsonObject().get("ymax").getAsDouble();
+		
+		return new double[]{ xmin, ymin, xmax, ymax };
 	}
 	
 	private JsonObject getSpatialReference() {
@@ -96,18 +119,16 @@ public class QueryBuilder {
 		return obj;
 	}
 	
-	@Cacheable("geoJsons")
-	private JsonArray getFeatures(String dbUrl) {
+	private JsonArray getFeatures(List<String> geoJsons, boolean returnGeometry) {
 		log.debug("Getting features...");
 		JsonArray arr = new JsonArray();
 		
-		List<String> geoJsons = handler.getGeoJsonsFromTable(dbUrl);
 		int numObjects = geoJsons.size();
 		log.debug(String.format("%d results found...", numObjects));
 		
 		if(numObjects > 0) {
 			for(int i = 0; i < numObjects; i++) {
-				arr.add(getFeature(geoJsons, i));
+				arr.add(getFeature(geoJsons, i, returnGeometry));
 			}
 		}
 		
@@ -116,7 +137,7 @@ public class QueryBuilder {
 	}
 	
 	@Cacheable("esriJson")
-	private JsonObject getFeature(List<String> geoJsons, int index) {
+	private JsonObject getFeature(List<String> geoJsons, int index, boolean returnGeometry) {
 		JsonObject obj = new JsonObject();
 		
 		obj.add("attributes", getAttributes(index));
@@ -124,7 +145,9 @@ public class QueryBuilder {
 		String esriJson = getEsriJson(geoJsons.get(index));
 		JsonParser parser = new JsonParser();
 		
-		obj.add("geometry", parser.parse(esriJson));
+		if(returnGeometry) {
+			obj.add("geometry", parser.parse(esriJson));
+		}
 		
 		return obj;
 	}

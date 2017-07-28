@@ -4,7 +4,7 @@
 	"name": "Bodemkaart Veengebied",
 	"type": "Feature Layer",
 	"serviceItemId": "edf6d445a5524f7a8739241986ee3bfc",
-	"displayField": "BODEMCODE",
+	"displayField": "OBJECTID",
 	"description": "",
 	"copyrightText": "",
 	"defaultVisibility": true,
@@ -101,14 +101,26 @@
 			"defaultValue": null
 		},
 		{
-			"name": "BODEMCODE",
-			"type": "esriFieldTypeInteger",
-			"alias": "Bodemcode",
+			"name": "CODE",
+			"type": "esriFieldTypeString",
+			"alias": "CODE",
 			"sqlType": "sqlTypeOther",
+			"length": 80,
 			"nullable": true,
 			"editable": true,
 			"domain": null,
-			"defaultValue": false
+			"defaultValue": null
+		},
+		{
+			"name": "OMSCHRIJVI",
+			"type": "esriFieldTypeString",
+			"alias": "Omschrijving",
+			"sqlType": "sqlTypeOther",
+			"length": 200,
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
 		}
 	],
 	"indexes": [
@@ -135,7 +147,8 @@
 			"drawingTool": "esriFeatureEditToolPoint",
 			"prototype": {
 				"attributes": {
-					"Bodemcode": null
+					"CODE": null,
+					"OMSCHRIJVI": null
 				}
 			}
 		}

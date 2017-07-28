@@ -5,7 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,11 +27,19 @@ public class QueryHandler {
 	 * Queries the database to get all geometries and let Postgres return them as GeoJson
 	 * 
 	 * @param dbUrl - The table name
+	 * @param extent - The extent in [xmin, ymin, xmax, ymax]
+	 * @param outSR - The spatialRel for output
+	 * @param resultOffset - The OFFSET
+	 * @param resultRecordCount - The LIMIT
 	 * @return The geometry in GeoJson
 	 */
-	public List<String> getGeoJsonsFromTable(String dbUrl) {
+	public Map<String, Object> getDataFromTable(String dbUrl, double[] extent, int outSR, int resultOffset, int resultRecordCount) {
 		log.debug("Connecting to the database...");
-		String query = String.format("SELECT ST_AsGeoJson(\"SHAPE\") AS geo FROM %s", dbUrl);
+		Map<String, Object> data = new HashMap<>();
+		List<String> geoJsons = null;
+		
+		String query = String.format("SELECT ST_AsGeoJson(\"SHAPE\") AS geo FROM %s%s LIMIT %d OFFSET %d", 
+				dbUrl, getWhereExtent(extent, outSR), resultRecordCount, resultOffset);
 		
 		try(Connection conn = jdbcTemplate.getDataSource().getConnection();
 			PreparedStatement statement = conn.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE,
@@ -45,17 +55,26 @@ public class QueryHandler {
 				rs.beforeFirst();
 			}
 			
-			List<String> list = new ArrayList<>(numRows);
+			geoJsons = new ArrayList<>(numRows);
 			while(rs.next()) {
-				list.add(rs.getString("geo"));
+				geoJsons.add(rs.getString("geo"));
 			}
 			log.debug("Got the data from the database...");
-			return list;
 			
 		} catch (SQLException e) {
 			log.error(e.getMessage(), e);
 		}
+		data.put("geoJsons", geoJsons);
 		
-		return new ArrayList<>();
+		return data;
+	}
+	
+	private String getWhereExtent(double[] extent, int outSR) {
+		if(extent.length == 0) {
+			return "";
+		}
+		return "WHERE ST_Overlaps(\"SHAPE\", ST_MakeEnvelope(" + extent[0] + ", " + extent[1] + ", "
+															   + extent[2] + ", " + extent[3] + ", " 
+															   + outSR + "))";
 	}
 }

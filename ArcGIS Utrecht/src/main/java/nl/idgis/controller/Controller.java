@@ -121,14 +121,11 @@ public class Controller {
 	 * @param formatType - The response format. The default response format is html.
 	 * @param where - A where clause for the query filter. Any legal SQL where clause operating on the fields in the layer is allowed.
 	 * @param returnGeometry - If true, the resultset includes the geometry associated with each result. The default is true.
-	 * @param spatialRel - The spatial relationship to be applied on the input geometry while performing the query. 
-	 * 		The supported spatial relationships include intersects, contains, envelope intersects, within, etc. The default 
-	 * 		spatial relationship is intersects (esriSpatialRelIntersects).
+	 * @param geometry - The extent of the geometry to get from the database.
 	 * @param outFields -  The list of fields to be included in the returned resultset. This list is a comma delimited 
 	 * 		list of field names. If you specify the shape field in the list of return fields, it is ignored. To request geometry, 
 	 * 		set returnGeometry to true. You can also specify the wildcard "*" as the value of this parameter. In this case, the 
-	 * 		query results include all the field values. 
-	 * @param outSR - The spatial reference of the returned geometry. 
+	 * 		query results include all the field values.
 	 * @param resultOffset - Description: This option can be used for fetching query results by skipping the specified number 
 	 * 		of records and starting from the next record (that is, resultOffset + 1th). The default is 0. This parameter only 
 	 * 		applies if supportsPagination is true. You can use this option to fetch records that are beyond maxRecordCount. 
@@ -138,17 +135,6 @@ public class Controller {
 	 * 		When resultOffset is specified but this parameter is not, the map service defaults it to maxRecordCount. 
 	 * 		The maximum value for this parameter is the value of the layer's maxRecordCount property. This parameter only applies if 
 	 * 		supportsPagination is true. Example: resultRecordCount=10 to fetch up to 10 records
-	 * @param quantizationParameters -  Used to project the geometry onto a virtual grid, likely representing pixels on the screen. This parameter 
-	 * 		only applies if supportsCoordinatesQuantization is true. 
-	 * 		<br>extent -  An extent defining the quantization grid bounds. Its SpatialReference matches the input geometry spatial reference 
-	 * 		if one is specified for the query. Otherwise, the extent will be in the layer's spatial reference.
-	 * 		<br>mode - Geometry coordinates are optimized for viewing and displaying of data. Value: view
-	 * 		<br>originPosition - Integer coordinates will be returned relative to the origin position defined by this property value. 
-	 * 		Default is upperLeft origin position. Values: upperLeft | lowerLeft
-	 * 		<br>tolerance - The tolerance is the size of one pixel in the outSpatialReference units, this number is used to convert the 
-	 * 		coordinates to integers by building a grid with resolution matching the tolerance. Each coordinate is then snapped to one pixel on the grid. 
-	 * 		Consecutive coordinates snapped to the same pixel are removed to reduce the overall response size. 
-	 * 		If the tolerance is not specified, the maxAllowableOffset is used.
 	 * @return The metadata for the specified query in JSON
 	 */
 	@RequestMapping("/services/{serviceName}/FeatureServer/{layerId}/query")
@@ -158,12 +144,10 @@ public class Controller {
 			@RequestParam(value="f", defaultValue="json") String formatType,
 			@RequestParam(value="where", defaultValue="") String where,
 			@RequestParam(value="returnGeometry", defaultValue="true") boolean returnGeometry,
-			@RequestParam(value="spatialRel", defaultValue="esriSpatialRelIntersects") String spatialRel,
-			@RequestParam(value="outFields", defaultValue="*") String outFields,
-			@RequestParam(value="outSR", defaultValue="0") long outSR,
+			@RequestParam(value="geometry", defaultValue="") String geometry,
+			@RequestParam(value="outSR", defaultValue="28992") int outSR,
 			@RequestParam(value="resultOffset", defaultValue="0") int resultOffset,
-			@RequestParam(value="resultRecordCount", defaultValue="0") int resultRecordCount,
-			@RequestParam(value="quantizationParameters", defaultValue="") String quantizationParameters) {
+			@RequestParam(value="resultRecordCount", defaultValue="1000") int resultRecordCount) {
 		
 		log.debug(String.format("Got a query request for layer %d, getting data...", layerId));
 		
@@ -173,7 +157,7 @@ public class Controller {
 			return new ResponseEntity<>(ErrorMessageHandler.getErrorMessage(FORMAT_ERROR_MESSAGE), HttpStatus.BAD_REQUEST);
 		}
 		
-		String retVal = builder.getJsonQueryResult(layerId);
+		String retVal = builder.getJsonQueryResult(layerId, returnGeometry, geometry, outSR, resultOffset, resultRecordCount);
 		
 		HttpHeaders headers = new HttpHeaders();
 		//headers.setCacheControl("public, max-age=86400");

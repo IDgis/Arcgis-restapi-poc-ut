@@ -30,7 +30,8 @@ public class QueryBuilder {
 	
 	private static final Logger log = LoggerFactory.getLogger(QueryBuilder.class);
 	
-	@Autowired QueryHandler handler;
+	@Autowired 
+	private QueryHandler handler;
 
 	/**
 	 * Builds the json to return to ArcGIS so the results can be displayed on the map.

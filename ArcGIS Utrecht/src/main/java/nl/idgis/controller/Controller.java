@@ -70,7 +70,7 @@ public class Controller {
 	 * @param formatType - The return type for the metadata. Only json is available.
 	 * @return The metadata of the FeatureServer in JSON.
 	 */
-	@RequestMapping("/services/{serviceName}/FeatureServer")
+	@RequestMapping("/services/{serviceName}")
 	public ResponseEntity<Map<String, Object>> getFeatureServerMetadata(
 			@PathVariable String serviceName,
 			@RequestParam(value="f", defaultValue="json") String formatType) {
@@ -93,7 +93,7 @@ public class Controller {
 	 * @param formatType - The return type for the metadata. Only json is available.
 	 * @return The metadata of the FeatureLayer in JSON.
 	 */
-	@RequestMapping("/services/{serviceName}/FeatureServer/{layerId}")
+	@RequestMapping("/services/{serviceName}/{layerId}")
 	public ResponseEntity<Map<String, Object>> getFeatureLayerMetadata(
 			@PathVariable String serviceName,
 			@PathVariable int layerId,
@@ -142,7 +142,7 @@ public class Controller {
 	 * 		supportsPagination is true. Example: resultRecordCount=10 to fetch up to 10 records
 	 * @return The metadata for the specified query in JSON
 	 */
-	@RequestMapping("/services/{serviceName}/FeatureServer/{layerId}/query")
+	@RequestMapping("/services/{serviceName}/{layerId}/query")
 	public ResponseEntity<Map<String, Object>> getQueryResult(
 			@PathVariable String serviceName,
 			@PathVariable int layerId,

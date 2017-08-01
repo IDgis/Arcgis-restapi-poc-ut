@@ -1,9 +1,11 @@
 buildscript {
     repositories {
+    	jcenter()
         mavenCentral()
     }
     dependencies {
-        classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.4.2.RELEASE'
+        classpath('org.springframework.boot:spring-boot-gradle-plugin:1.4.2.RELEASE')
+        classpath('se.transmode.gradle:gradle-docker:1.2')
     }
 }
 
@@ -18,6 +20,9 @@ repositories {
     mavenCentral()
 }
 
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.springframework.boot:spring-boot-devtools')
@@ -25,9 +30,24 @@ dependencies {
     compile('org.postgresql:postgresql')
     compile('com.google.code.gson:gson:2.2.4')
     testCompile('org.springframework.boot:spring-boot-starter-test')
+    
+    compile files('./includes/Terraformer-1.0.jar')
 }
 
 jar {
     baseName = 'arcgis-restapi-utrecht'
     version = '0.1.1'
+}
+
+apply plugin: 'docker'
+
+task buildDocker(type: Docker, dependsOn: build) {
+	applicationName = jar.baseName
+	dockerfile = file('Dockerfile')
+	doFirst {
+		copy {
+			from jar
+			into stageDir
+		}
+	}
 }

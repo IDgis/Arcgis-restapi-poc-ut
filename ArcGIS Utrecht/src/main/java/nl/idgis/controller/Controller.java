@@ -1,8 +1,12 @@
 package nl.idgis.controller;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.JsonParser;
+import org.springframework.boot.json.JsonParserFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +43,7 @@ public class Controller {
 	 * @return
 	 */
 	@RequestMapping("/info")
-	public ResponseEntity<String> getServerInfo(
+	public ResponseEntity<Map<String, Object>> getServerInfo(
 			@RequestParam(value="f", defaultValue="json") String formatType) {
 		
 		if(!"json".equalsIgnoreCase(formatType)) {
@@ -55,7 +59,8 @@ public class Controller {
 		obj.addProperty("isTokenBasedSecurity", false);
 		obj.add("authInfo", authInfo);
 		
-		return new ResponseEntity<>(obj.toString(), HttpStatus.OK);
+		JsonParser parser = JsonParserFactory.getJsonParser();
+		return new ResponseEntity<>(parser.parseMap(obj.toString()), HttpStatus.OK);
 	}
 
 	/**
@@ -66,7 +71,7 @@ public class Controller {
 	 * @return The metadata of the FeatureServer in JSON.
 	 */
 	@RequestMapping("/services/{serviceName}/FeatureServer")
-	public ResponseEntity<String> getFeatureServerMetadata(
+	public ResponseEntity<Map<String, Object>> getFeatureServerMetadata(
 			@PathVariable String serviceName,
 			@RequestParam(value="f", defaultValue="json") String formatType) {
 		
@@ -89,7 +94,7 @@ public class Controller {
 	 * @return The metadata of the FeatureLayer in JSON.
 	 */
 	@RequestMapping("/services/{serviceName}/FeatureServer/{layerId}")
-	public ResponseEntity<String> getFeatureLayerMetadata(
+	public ResponseEntity<Map<String, Object>> getFeatureLayerMetadata(
 			@PathVariable String serviceName,
 			@PathVariable int layerId,
 			@RequestParam(value="f", defaultValue="json") String formatType) {
@@ -138,7 +143,7 @@ public class Controller {
 	 * @return The metadata for the specified query in JSON
 	 */
 	@RequestMapping("/services/{serviceName}/FeatureServer/{layerId}/query")
-	public ResponseEntity<String> getQueryResult(
+	public ResponseEntity<Map<String, Object>> getQueryResult(
 			@PathVariable String serviceName,
 			@PathVariable int layerId,
 			@RequestParam(value="f", defaultValue="json") String formatType,
@@ -159,10 +164,10 @@ public class Controller {
 		
 		String retVal = builder.getJsonQueryResult(layerId, where, returnGeometry, geometry, outSR, resultOffset, resultRecordCount);
 		
-		HttpHeaders headers = new HttpHeaders();
-		headers.setCacheControl("public, max-age=86400");
-		
 		log.debug("Got the data, returning the result...");
-		return new ResponseEntity<>(retVal, headers, HttpStatus.OK);
+		HttpHeaders headers = new HttpHeaders();
+		headers.setCacheControl("private, max-age=86400");
+		JsonParser parser = JsonParserFactory.getJsonParser();
+		return new ResponseEntity<>(parser.parseMap(retVal), headers, HttpStatus.OK);
 	}
 }

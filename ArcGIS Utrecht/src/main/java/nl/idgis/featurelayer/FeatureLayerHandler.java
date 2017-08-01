@@ -1,11 +1,12 @@
 package nl.idgis.featurelayer;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.gson.JsonParser;
+import org.springframework.boot.json.JsonParser;
+import org.springframework.boot.json.JsonParserFactory;
 
 import nl.idgis.ErrorMessageHandler;
 import nl.idgis.MetaDataHandler;
@@ -19,7 +20,7 @@ public class FeatureLayerHandler implements MetaDataHandler {
 		log.debug("Creating FeatureLayerHandler...");
 	}
 	
-	public String getMetadata(String fileUrl) {
+	public Map<String, Object> getMetadata(String fileUrl) {
 		log.info("Getting metadata for feature layer...");
 		String fileContent = null;
 		try {
@@ -29,8 +30,7 @@ public class FeatureLayerHandler implements MetaDataHandler {
 			return ErrorMessageHandler.getErrorMessage(String.format("Could not open or read the file from: %s", fileUrl));
 		}
 		
-		JsonParser parser = new JsonParser();
-		
-		return parser.parse(fileContent).toString();
+		JsonParser parser = JsonParserFactory.getJsonParser();
+		return parser.parseMap(fileContent);
 	}
 }

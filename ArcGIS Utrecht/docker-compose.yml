@@ -1,0 +1,14 @@
+version: '2'
+
+services:
+
+    pub.restapi:
+        image: arcgis-restapi-utrecht
+        restart: always
+        ports:
+            - "8080:8080"
+        expose:
+            - "8080"
+        environment:
+            - DB_USER=publisher
+            - DB_PASSWORD=publisher

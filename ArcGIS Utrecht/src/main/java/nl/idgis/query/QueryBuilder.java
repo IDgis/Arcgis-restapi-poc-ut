@@ -6,7 +6,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import com.esri.terraformer.core.Terraformer;
@@ -39,16 +38,13 @@ public class QueryBuilder {
 	 * @param layerId - The layer number
 	 * @return
 	 */
-	@Cacheable("data")
-	@SuppressWarnings("unchecked")
 	public String getJsonQueryResult(int layerId, String where, boolean returnGeometry, String geometry, int outSR, int resultOffset, int resultRecordCount) {
 		log.debug("Generating data...");
 		String dbUrl = getDbUrl(layerId);
 		String[] fields = getFieldsToGet(layerId);
+		log.debug("Fields to filter: " + fields.toString());
 		double[] extent = getExtentFromGeometry(geometry);
-		Map<String, Object> data = handler.getDataFromTable(dbUrl, fields, where, extent, outSR, resultOffset, resultRecordCount);
-		
-		List<String> geoJsons = (List<String>)data.get("geoJsons");
+		Map<String, List<String>> data = handler.getDataFromTable(dbUrl, fields, where, extent, outSR, resultOffset, resultRecordCount);
 		
 		JsonObject obj = new JsonObject();
 		
@@ -57,13 +53,19 @@ public class QueryBuilder {
 		obj.addProperty("geometryType", "esriGeometryPolygon");
 		obj.add("spatialReference", getSpatialReference());
 		obj.add("fields", getFields(layerId));
-		obj.add("features", getFeatures(geoJsons, returnGeometry));
+		obj.add("features", getFeatures(data, returnGeometry, fields));
 		
 		return obj.toString();
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////
 	
+	/**
+	 * Gets the name of the table to search
+	 * 
+	 * @param layerId - The layer id
+	 * @return The table name
+	 */
 	private String getDbUrl(int layerId) {
 		switch(layerId) {
 		case 0:
@@ -75,6 +77,12 @@ public class QueryBuilder {
 		}
 	}
 	
+	/**
+	 * Gets all fields from the layer metadata. These are the column names to get from the database table
+	 * 
+	 * @param layerId - The layer id
+	 * @return The names of the columns to filter
+	 */
 	private String[] getFieldsToGet(int layerId) {
 		switch(layerId) {
 		case 0:
@@ -86,6 +94,12 @@ public class QueryBuilder {
 		}
 	}
 	
+	/**
+	 * Gets the extent from the geometry attribute
+	 * 
+	 * @param geometry - The geometry attribute
+	 * @return Return the extent as a double[]
+	 */
 	private double[] getExtentFromGeometry(String geometry) {
 		if("".equals(geometry)) {
 			return new double[0];
@@ -102,6 +116,11 @@ public class QueryBuilder {
 		return new double[]{ xmin, ymin, xmax, ymax };
 	}
 	
+	/**
+	 * Gets the spatialRel
+	 * 
+	 * @return The spatialRel
+	 */
 	private JsonObject getSpatialReference() {
 		log.debug("Getting spatialReference...");
 		JsonObject obj = new JsonObject();
@@ -112,6 +131,12 @@ public class QueryBuilder {
 		return obj;
 	}
 	
+	/**
+	 * Gets the column names to filter and displays them within the field array.
+	 * 
+	 * @param layerId - The layer id
+	 * @return The fields as a JsonArray
+	 */
 	private JsonArray getFields(int layerId) {
 		log.debug("Getting fields...");
 		
@@ -123,6 +148,11 @@ public class QueryBuilder {
 		}
 	}
 	
+	/**
+	 * Hard-coded fields for the Layer Aardkundige waarden.
+	 * 
+	 * @return
+	 */
 	private JsonArray getAardkundigeFields() {
 		JsonArray arr = new JsonArray();
 		
@@ -197,6 +227,11 @@ public class QueryBuilder {
 		return arr;
 	}
 	
+	/**
+	 * Hard-coded fields for the Layer Veengebieden
+	 * 
+	 * @return
+	 */
 	private JsonArray getVeengebiedFields() {
 		JsonArray arr = new JsonArray();
 		
@@ -218,32 +253,50 @@ public class QueryBuilder {
 		omschrijving.add("domain", null);
 		omschrijving.add("defaultValue", null);
 		
+		arr.add(code);
+		arr.add(omschrijving);
 		return arr;
 	}
 	
-	private JsonArray getFeatures(List<String> geoJsons, boolean returnGeometry) {
+	/**
+	 * Gets all features as an JsonArray for the given table
+	 * 
+	 * @param data - All the filtered data from the database
+	 * @param returnGeometry - A boolean whether the geometries should be returned
+	 * @param fields - The filtered column names
+	 * @return
+	 */
+	private JsonArray getFeatures(Map<String, List<String>> data, boolean returnGeometry, String[] fields) {
 		log.debug("Getting features...");
 		JsonArray arr = new JsonArray();
 		
-		int numObjects = geoJsons.size();
+		int numObjects = (data.get("geoJsons")).size();
 		log.debug(String.format("%d results found...", numObjects));
 		
 		if(numObjects > 0) {
 			for(int i = 0; i < numObjects; i++) {
-				arr.add(getFeature(geoJsons, i, returnGeometry));
+				arr.add(getFeature(data, i, returnGeometry, fields));
 			}
 		}
 		
-		log.debug("All features found, returning the array...");
 		return arr;
 	}
 	
-	@Cacheable("esriJson")
-	private JsonObject getFeature(List<String> geoJsons, int index, boolean returnGeometry) {
+	/**
+	 * Gets each feature as a JsonObject and appends it to the rest of the metadata
+	 * 
+	 * @param data - All filtered data from the database
+	 * @param index - This feature number
+	 * @param returnGeometry - Boolean whether the geometries should be returned
+	 * @param fields - The filtered column names
+	 * @return
+	 */
+	private JsonObject getFeature(Map<String, List<String>> data, int index, boolean returnGeometry, String[] fields) {
 		JsonObject obj = new JsonObject();
 		
-		obj.add("attributes", getAttributes(index));
+		obj.add("attributes", getAttributes(data, index, fields));
 		
+		List<String> geoJsons = data.get("geoJsons");
 		String esriJson = getEsriJson(geoJsons.get(index));
 		JsonParser parser = new JsonParser();
 		
@@ -254,14 +307,38 @@ public class QueryBuilder {
 		return obj;
 	}
 	
-	private JsonObject getAttributes(int index) {
+	/**
+	 * Gets all attributes for the current feature
+	 * 
+	 * @param data - All filtered data from the database
+	 * @param index - The number of the current feature
+	 * @param fields - The filtered column names
+	 * @return
+	 */
+	private JsonObject getAttributes(Map<String, List<String>> data, int index, String[] fields) {
 		JsonObject obj = new JsonObject();
 		
 		obj.addProperty("OBJECTID", index + 1);
 		
+		for(int i = 0; i < fields.length; i++) {
+			String field = fields[i];
+			if("geoJsons".equalsIgnoreCase(field)) {
+				continue;
+			}
+			
+			String listObj = data.get(field).get(index);
+			obj.addProperty(field, listObj);
+		}
+		
 		return obj;
 	}
 	
+	/**
+	 * Converts the GeoJson String to an EsriJson String
+	 * 
+	 * @param geoJson - The GeoJson String
+	 * @return
+	 */
 	private String getEsriJson(String geoJson) {
 		Terraformer t = new Terraformer();
 		

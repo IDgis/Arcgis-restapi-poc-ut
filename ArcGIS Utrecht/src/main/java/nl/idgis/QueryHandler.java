@@ -24,19 +24,20 @@ public class QueryHandler {
 	private JdbcTemplate jdbcTemplate;
 	
 	/**
-	 * Queries the database to get all geometries and let Postgres return them as GeoJson
+	 * Queries the database to get all data speciefied by the field array and stores them in Lists in a HashMap.
 	 * 
 	 * @param dbUrl - The table name
+	 * @param fields - All column names to get from the database
 	 * @param extent - The extent in [xmin, ymin, xmax, ymax]
 	 * @param outSR - The spatialRel for output
 	 * @param resultOffset - The OFFSET
 	 * @param resultRecordCount - The LIMIT
-	 * @return The geometry in GeoJson
+	 * @return All data specified in the fields array.
 	 */
-	public Map<String, Object> getDataFromTable(String dbUrl, String[] fields, String where, double[] extent, int outSR, int resultOffset, int resultRecordCount) {
+	public Map<String, List<String>> getDataFromTable(String dbUrl, String[] fields, String where, double[] extent, int outSR, int resultOffset, int resultRecordCount) {
 		log.debug("Connecting to the database...");
-		Map<String, Object> data = new HashMap<>();
-		List<Object> list = null;
+		Map<String, List<String>> data = new HashMap<>();
+		List<String> list = null;
 		
 		String query = String.format("SELECT ST_AsGeoJson(\"SHAPE\") AS geoJsons, * FROM %s%s LIMIT %d OFFSET %d", 
 				dbUrl, getWhereExtent(where, extent, outSR), resultRecordCount, resultOffset);
@@ -60,7 +61,7 @@ public class QueryHandler {
 				rs.beforeFirst();
 				list = new ArrayList<>(numRows);
 				while(rs.next()) {
-					list.add(rs.getObject(fields[i]));
+					list.add(rs.getString(fields[i]));
 				}
 				data.put(fields[i], list);
 			}
@@ -74,6 +75,14 @@ public class QueryHandler {
 		return data;
 	}
 	
+	/**
+	 * Gets the geometries within the given bounding box and extends with the where clause
+	 * 
+	 * @param where - The WHERE clause
+	 * @param extent - The bounding box in which the geometries to get
+	 * @param outSR - The spatialRel
+	 * @return Returns the WHERE string
+	 */
 	private String getWhereExtent(String where, double[] extent, int outSR) {
 		if(extent.length == 0) {
 			return "";

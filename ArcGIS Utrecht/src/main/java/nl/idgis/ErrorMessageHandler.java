@@ -1,16 +1,17 @@
 package nl.idgis;
 
-import com.google.gson.JsonObject;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ErrorMessageHandler {
 	
 	private ErrorMessageHandler() {}
 
-	public static String getErrorMessage(String message) {
-		JsonObject obj = new JsonObject();
+	public static Map<String, Object> getErrorMessage(String message) {
+		Map<String, Object> obj = new HashMap<>();
 		
-		obj.addProperty("error", message);
+		obj.put("error", message);
 		
-		return obj.toString();
+		return obj;
 	}
 }

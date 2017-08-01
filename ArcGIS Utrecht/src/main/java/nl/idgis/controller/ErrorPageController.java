@@ -15,7 +15,7 @@ public class ErrorPageController implements ErrorController {
 	@RequestMapping(PATH)
 	public Map<String, Object> error() {
 		Map<String, Object> retVal = new HashMap<>();
-		retVal.put("error", "Something went wrong!! Use URL: /ArcGIS/rest/services/Bodemlagen/FeatureServer");
+		retVal.put("error", "Invalid url!! Use URL: /ArcGIS/rest/services/Bodemlagen/FeatureServer");
 		return retVal;
 	}
 	

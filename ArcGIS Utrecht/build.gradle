@@ -28,6 +28,8 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-jdbc')
     compile('org.postgresql:postgresql')
     compile('com.google.code.gson:gson:2.2.4')
+    compile group: 'com.vividsolutions', name: 'jts', version: '1.13'
+    compile group: 'org.wololo', name: 'jts2geojson', version: '0.10.0'
     testCompile('org.springframework.boot:spring-boot-starter-test')
     
     compile files('./includes/Terraformer-1.0.jar')

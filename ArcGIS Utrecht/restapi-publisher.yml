@@ -3,12 +3,12 @@ version: '2'
 services:
 
     pub.restapi:
-        image: arcgis-restapi-utrecht:0.1.0
+        image: idgis/arcgis-restapi-utrecht:0.1.1
         restart: always
         expose:
             - "8080"
         ports:
-            - "${IP_ADDR}8080:8080"
+            - "${IP_ADDR}:8080:8080"
         environment:
             - DB_USER=publisher
-            - DB_PASSWORD=publisher
+            - DB_PASSWORD=${PUB_PG_PASSWORD}

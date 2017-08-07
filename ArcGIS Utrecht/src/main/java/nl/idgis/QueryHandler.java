@@ -42,6 +42,7 @@ public class QueryHandler {
 		String query = String.format("SELECT ST_AsGeoJson(\"SHAPE\") AS geoJsons, * FROM %s%s LIMIT %d OFFSET %d", 
 				dbUrl, getWhereExtent(where, extent, outSR), resultRecordCount, resultOffset);
 		log.debug("Query: " + query);
+		log.debug(jdbcTemplate.getDataSource().toString());
 		
 		try(Connection conn = jdbcTemplate.getDataSource().getConnection();
 			PreparedStatement statement = conn.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE,

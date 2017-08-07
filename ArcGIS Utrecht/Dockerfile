@@ -10,6 +10,7 @@ COPY examples/ /examples/
 
 ENTRYPOINT ["java", \
 			"-jar", \
-			"-DDB_USER=$DB_USER", \
-			"-DDB_PASSWORD=$DB_PASSWORD", \
+			"-D DB_USER=$DB_USER", \
+			"-D DB_PASSWORD=$DB_PASSWORD", \
+			"-D DB_HOST=$DB_HOST", \
 			"/app/arcgis-restapi-utrecht-0.1.1.jar"]

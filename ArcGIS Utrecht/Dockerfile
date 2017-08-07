@@ -13,4 +13,5 @@ ENTRYPOINT ["java", \
 			"-D DB_USER=$DB_USER", \
 			"-D DB_PASSWORD=$DB_PASSWORD", \
 			"-D DB_HOST=$DB_HOST", \
+			"-D DB_PORT=$DB_PORT", \
 			"/app/arcgis-restapi-utrecht-0.1.1.jar"]

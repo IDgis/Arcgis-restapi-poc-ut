@@ -12,4 +12,5 @@ services:
         environment:
             - DB_USER=publisher
             - DB_PASSWORD=${PUB_PG_PASSWORD}
-            - DB_HOST=${IP_ADDR}
+            - DB_PORT=5432
+            - DB_HOST=pub.db

@@ -125,12 +125,12 @@ public class QueryHandler {
 		if(where.indexOf('(') != -1) {
 			int i = where.indexOf('(');
 			while(i != -1) {
-				where = where.replace(where.substring(i + 1, where.indexOf('=', i + 1) - 1), "\"" + where.substring(i + 1, where.indexOf('=', i + 1) - 1) + "\"");
+				where = where.replace(where.substring(i + 1, where.indexOf(' ', i)), "\"" + where.substring(i + 1, where.indexOf(' ', i)) + "\"");
 				i = where.indexOf('(', i + 1);
 			}
 			return where;
 		}
 		
-		return where.replace(where.substring(0, where.indexOf('=')), "\"" + where.substring(0, where.indexOf('=')) + "\"");
+		return where.replace(where.substring(0, where.indexOf(' ')), "\"" + where.substring(0, where.indexOf(' ')) + "\"");
 	}
 }

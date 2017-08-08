@@ -34,13 +34,13 @@ public class QueryHandler {
 	 * @param resultRecordCount - The LIMIT
 	 * @return All data specified in the fields array.
 	 */
-	public Map<String, List<String>> getDataFromTable(String dbUrl, String[] fields, String where, double[] extent, int outSR, int resultOffset, int resultRecordCount) {
+	public Map<String, List<String>> getDataFromTable(String dbUrl, String[] fields, String where, double[] extent, String outFields, int outSR, int resultOffset, int resultRecordCount) {
 		log.debug("Connecting to the database...");
 		Map<String, List<String>> data = new HashMap<>();
 		List<String> list = null;
 		
-		String query = String.format("SELECT ST_AsGeoJson(\"SHAPE\") AS geoJsons, * FROM %s%s LIMIT %d OFFSET %d", 
-				dbUrl, getWhereExtent(where, extent, outSR), resultRecordCount, resultOffset);
+		String query = String.format("SELECT ST_AsGeoJson(\"SHAPE\") AS geoJsons, %s FROM %s%s LIMIT %d OFFSET %d", 
+				getOutFields(outFields), dbUrl, getWhereExtent(where, extent, outSR), resultRecordCount, resultOffset);
 		log.debug("Query: " + query);
 		log.debug(jdbcTemplate.getDataSource().toString());
 		
@@ -76,6 +76,25 @@ public class QueryHandler {
 		return data;
 	}
 	
+	private String getOutFields(String outFields) {
+		if("*".equals(outFields)) {
+			return outFields;
+		}
+		
+		String[] fields = outFields.split(",");
+		StringBuilder builder = new StringBuilder();
+		builder.append("\"" + fields[0] + "\"");
+		
+		if(fields.length > 1) {
+			for(int i = 1; i < fields.length; i++) {
+				builder.append(",\"" + fields[i] + "\"");
+			}
+		}
+		
+		
+		return builder.toString();
+	}
+	
 	/**
 	 * Gets the geometries within the given bounding box and extends with the where clause
 	 * 
@@ -93,9 +112,25 @@ public class QueryHandler {
 															   + extent[2] + ", " + extent[3] + ", " 
 															   + outSR + "))");
 		if(!"".equals(where)) {
-			builder.append(" AND " + where);
+			builder.append(" AND ");
+			builder.append(parseWhere(where));
 		}
 		
 		return builder.toString();
+	}
+	
+	private String parseWhere(String where) {
+		log.debug("Where: " + where);
+		
+		if(where.indexOf('(') != -1) {
+			int i = where.indexOf('(');
+			while(i != -1) {
+				where = where.replace(where.substring(i + 1, where.indexOf('=', i + 1) - 1), "\"" + where.substring(i + 1, where.indexOf('=', i + 1) - 1) + "\"");
+				i = where.indexOf('(', i + 1);
+			}
+			return where;
+		}
+		
+		return where.replace(where.substring(0, where.indexOf('=')), "\"" + where.substring(0, where.indexOf('=')) + "\"");
 	}
 }

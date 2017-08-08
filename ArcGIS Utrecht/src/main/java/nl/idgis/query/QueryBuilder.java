@@ -25,8 +25,8 @@ public class QueryBuilder {
 	private static final String AARDKUNDIG = "staging_data.\"222b66f4-b450-4871-8874-52170d56b1e8\"";
 	private static final String VEENGEBIED = "staging_data.\"bddbf261-4401-47e0-a721-d832a44e0462\"";
 	
-	private static final String[] aardkundigFields = {"INSPIREID", "PERCENTAGEUNDERDESIGNATION", "URL1", "URL2", "GEBIEDSOMS", "FUNCTIE", "geoJsons"};
-	private static final String[] veengebiedFields = {"CODE", "OMSCHRIJVI", "geoJsons"};
+	private static final String[] aardkundigFields = {"OBJECTID", "INSPIREID", "PERCENTAGEUNDERDESIGNATION", "URL1", "URL2", "GEBIEDSOMS", "FUNCTIE", "geoJsons"};
+	private static final String[] veengebiedFields = {"OBJECTID", "CODE", "OMSCHRIJVI", "geoJsons"};
 	
 	private static final Logger log = LoggerFactory.getLogger(QueryBuilder.class);
 	
@@ -39,13 +39,18 @@ public class QueryBuilder {
 	 * @param layerId - The layer number
 	 * @return
 	 */
-	public String getJsonQueryResult(int layerId, String where, boolean returnGeometry, String geometry, int outSR, int resultOffset, int resultRecordCount) {
+	public String getJsonQueryResult(int layerId, String where, boolean returnGeometry, String geometry, String outFields, int outSR, int resultOffset, int resultRecordCount) {
 		log.debug("Generating data...");
 		String dbUrl = getDbUrl(layerId);
-		String[] fields = getFieldsToGet(layerId);
-		log.debug("Fields to filter: " + fields.toString());
+		String[] fields = getFieldsToGet(layerId, outFields);
+		
+		log.debug("Fields to filter: ");
+		for(String field : fields) {
+			log.debug(field);
+		}
+		
 		double[] extent = getExtentFromGeometry(geometry);
-		Map<String, List<String>> data = handler.getDataFromTable(dbUrl, fields, where, extent, outSR, resultOffset, resultRecordCount);
+		Map<String, List<String>> data = handler.getDataFromTable(dbUrl, fields, where, extent, outFields, outSR, resultOffset, resultRecordCount);
 		
 		JsonObject obj = new JsonObject();
 		
@@ -84,15 +89,27 @@ public class QueryBuilder {
 	 * @param layerId - The layer id
 	 * @return The names of the columns to filter
 	 */
-	private String[] getFieldsToGet(int layerId) {
-		switch(layerId) {
-		case 0:
-			return aardkundigFields;
-		case 1:
-			return veengebiedFields;
-		default:
-			return null;
+	private String[] getFieldsToGet(int layerId, String outFields) {
+		if("*".equals(outFields)) {
+			switch(layerId) {
+			case 0:
+				return aardkundigFields;
+			default:
+				return veengebiedFields;
+			}
 		}
+		
+		StringBuilder builder = new StringBuilder();
+		String[] fields = outFields.split(",");
+		builder.append(fields[0]);
+		if(fields.length > 1) {
+			for(int i = 1; i < fields.length; i++) {
+				builder.append("," + fields[i]);
+			}
+		}
+		builder.append(",geoJsons");
+		log.debug("outFields: " + builder.toString());
+		return builder.toString().split(",");
 	}
 	
 	/**
@@ -318,8 +335,6 @@ public class QueryBuilder {
 	 */
 	private JsonObject getAttributes(Map<String, List<String>> data, int index, String[] fields) {
 		JsonObject obj = new JsonObject();
-		
-		obj.addProperty("OBJECTID", index + 1);
 		
 		for(int i = 0; i < fields.length; i++) {
 			String field = fields[i];

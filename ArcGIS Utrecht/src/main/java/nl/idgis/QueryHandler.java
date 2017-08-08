@@ -40,7 +40,7 @@ public class QueryHandler {
 		List<String> list = null;
 		
 		String query = String.format("SELECT ST_AsGeoJson(\"SHAPE\") AS geoJsons, %s FROM %s%s LIMIT %d OFFSET %d", 
-				getOutFields(outFields), dbUrl, getWhereExtent(where, extent, outSR), resultRecordCount, resultOffset);
+				getOutFields(outFields), dbUrl, getWhereExtent(fields, where, extent, outSR), resultRecordCount, resultOffset);
 		log.debug("Query: " + query);
 		log.debug(jdbcTemplate.getDataSource().toString());
 		
@@ -103,7 +103,7 @@ public class QueryHandler {
 	 * @param outSR - The spatialRel
 	 * @return Returns the WHERE string
 	 */
-	private String getWhereExtent(String where, double[] extent, int outSR) {
+	private String getWhereExtent(String[] fields, String where, double[] extent, int outSR) {
 		if(extent.length == 0) {
 			return "";
 		}
@@ -113,24 +113,20 @@ public class QueryHandler {
 															   + outSR + "))");
 		if(!"".equals(where)) {
 			builder.append(" AND ");
-			builder.append(parseWhere(where));
+			builder.append(parseWhere(fields, where));
 		}
 		
 		return builder.toString();
 	}
 	
-	private String parseWhere(String where) {
+	private String parseWhere(String[] fields, String where) {
 		log.debug("Where: " + where);
 		
-		if(where.indexOf('(') != -1) {
-			int i = where.indexOf('(');
-			while(i != -1) {
-				where = where.replace(where.substring(i + 1, where.indexOf(' ', i)), "\"" + where.substring(i + 1, where.indexOf(' ', i)) + "\"");
-				i = where.indexOf('(', i + 1);
-			}
-			return where;
+		for(String field : fields) {
+			where = where.replace(field, "\"" + field + "\"");
 		}
 		
-		return where.replace(where.substring(0, where.indexOf(' ')), "\"" + where.substring(0, where.indexOf(' ')) + "\"");
+		log.debug("Return where: " + where);
+		return where;
 	}
 }

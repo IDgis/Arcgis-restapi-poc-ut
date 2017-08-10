@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import nl.idgis.ErrorMessageHandler;
@@ -58,6 +59,33 @@ public class Controller {
 		JsonObject authInfo = new JsonObject();
 		obj.addProperty("isTokenBasedSecurity", false);
 		obj.add("authInfo", authInfo);
+		
+		JsonParser parser = JsonParserFactory.getJsonParser();
+		return new ResponseEntity<>(parser.parseMap(obj.toString()), HttpStatus.OK);
+	}
+	
+	@RequestMapping("/services")
+	public ResponseEntity<Map<String, Object>> getServices(
+			@RequestParam(value="f", defaultValue="json") String formatType) {
+		
+		if(!"json".equalsIgnoreCase(formatType)) {
+			log.warn(FORMAT_ERROR_MESSAGE);
+			return new ResponseEntity<>(ErrorMessageHandler.getErrorMessage(FORMAT_ERROR_MESSAGE), HttpStatus.BAD_REQUEST);
+		}
+		
+		JsonObject obj = new JsonObject();
+		obj.addProperty("version", 10.51);
+		
+		JsonArray services = new JsonArray();
+		
+		JsonObject service = new JsonObject();
+		
+		service.addProperty("name", "Bodem_Data");
+		service.addProperty("type", "FeatureServer");
+		service.addProperty("url", "http://acc-services.geodata-utrecht.nl:8080/ArcGIS/rest/services/Bodem_Data");
+		services.add(service);
+		
+		obj.add("services", services);
 		
 		JsonParser parser = JsonParserFactory.getJsonParser();
 		return new ResponseEntity<>(parser.parseMap(obj.toString()), HttpStatus.OK);

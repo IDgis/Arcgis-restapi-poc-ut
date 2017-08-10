@@ -40,8 +40,8 @@ public class QueryHandler {
 		Map<String, List<String>> data = new HashMap<>();
 		List<String> list = null;
 		
-		String query = String.format("SELECT ST_AsGeoJson(\"SHAPE\") AS geoJsons, %s FROM %s%s LIMIT %d OFFSET %d", 
-				getOutFields(outFields), dbUrl, getWhereExtent(fields, where, extent, outSR), resultRecordCount, resultOffset);
+		String query = createQueryString(maxAllowableOffset, getOutFields(outFields), dbUrl, getWhereExtent(fields, where, extent, outSR), resultOffset, resultRecordCount);
+		
 		log.debug("Query: " + query);
 		log.debug(jdbcTemplate.getDataSource().toString());
 		
@@ -77,6 +77,40 @@ public class QueryHandler {
 		return data;
 	}
 	
+	/**
+	 * Creates a SQL query String to send to the database.
+	 */
+	private String createQueryString(String maxAllowableOffset, String outFields, String dbUrl, String whereClause, int resultOffset, int resultRecordCount) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("SELECT ST_AsGeoJson(");
+		
+		if(!"".equals(maxAllowableOffset)) {
+			builder.append("ST_SimplifyPreserveTopology(");
+		}
+		builder.append("\"SHAPE\"");
+		if(!"".equals(maxAllowableOffset)) {
+			builder.append(",");
+			builder.append(Float.parseFloat(maxAllowableOffset));
+			builder.append(")");
+		}
+		
+		builder.append(") AS geoJsons, ");
+		builder.append(getOutFields(outFields));
+		builder.append(" FROM ");
+		builder.append(dbUrl);
+		builder.append(whereClause);
+		builder.append(" OFFSET ");
+		builder.append(resultOffset);
+		builder.append(" LIMIT ");
+		builder.append(resultRecordCount);
+		
+		return builder.toString();
+	}
+	
+	
+	/**
+	 * Gets all columns to return by the query.
+	 */
 	private String getOutFields(String outFields) {
 		if("*".equals(outFields)) {
 			return outFields;

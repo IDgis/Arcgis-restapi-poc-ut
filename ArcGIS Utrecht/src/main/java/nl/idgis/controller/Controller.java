@@ -149,6 +149,7 @@ public class Controller {
 			@RequestParam(value="f", defaultValue="json") String formatType,
 			@RequestParam(value="where", defaultValue="") String where,
 			@RequestParam(value="returnGeometry", defaultValue="true") boolean returnGeometry,
+			@RequestParam(value="maxAllowableOffset", defaultValue="") String maxAllowableOffset,
 			@RequestParam(value="geometry", defaultValue="") String geometry,
 			@RequestParam(value="outFields", defaultValue="*") String outFields,
 			@RequestParam(value="outSR", defaultValue="28992") int outSR,
@@ -163,7 +164,7 @@ public class Controller {
 			return new ResponseEntity<>(ErrorMessageHandler.getErrorMessage(FORMAT_ERROR_MESSAGE), HttpStatus.BAD_REQUEST);
 		}
 		
-		String retVal = builder.getJsonQueryResult(layerId, where, returnGeometry, geometry, outFields, outSR, resultOffset, resultRecordCount);
+		String retVal = builder.getJsonQueryResult(layerId, where, returnGeometry, maxAllowableOffset, geometry, outFields, outSR, resultOffset, resultRecordCount);
 		
 		log.debug("Got the data, returning the result...");
 		HttpHeaders headers = new HttpHeaders();

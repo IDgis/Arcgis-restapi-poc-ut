@@ -39,7 +39,8 @@ public class QueryBuilder {
 	 * @param layerId - The layer number
 	 * @return
 	 */
-	public String getJsonQueryResult(int layerId, String where, boolean returnGeometry, String geometry, String outFields, int outSR, int resultOffset, int resultRecordCount) {
+	public String getJsonQueryResult(int layerId, String where, boolean returnGeometry, String maxAllowableOffset, String geometry, 
+			String outFields, int outSR, int resultOffset, int resultRecordCount) {
 		log.debug("Generating data...");
 		String dbUrl = getDbUrl(layerId);
 		String[] fields = getFieldsToGet(layerId, outFields);
@@ -50,7 +51,7 @@ public class QueryBuilder {
 		}
 		
 		double[] extent = getExtentFromGeometry(geometry);
-		Map<String, List<String>> data = handler.getDataFromTable(dbUrl, fields, where, extent, outFields, outSR, resultOffset, resultRecordCount);
+		Map<String, List<String>> data = handler.getDataFromTable(dbUrl, fields, where, extent, outFields, outSR, resultOffset, resultRecordCount, maxAllowableOffset);
 		
 		JsonObject obj = new JsonObject();
 		

@@ -34,7 +34,8 @@ public class QueryHandler {
 	 * @param resultRecordCount - The LIMIT
 	 * @return All data specified in the fields array.
 	 */
-	public Map<String, List<String>> getDataFromTable(String dbUrl, String[] fields, String where, double[] extent, String outFields, int outSR, int resultOffset, int resultRecordCount) {
+	public Map<String, List<String>> getDataFromTable(String dbUrl, String[] fields, String where, double[] extent, 
+			String outFields, int outSR, int resultOffset, int resultRecordCount, String maxAllowableOffset) {
 		log.debug("Connecting to the database...");
 		Map<String, List<String>> data = new HashMap<>();
 		List<String> list = null;
